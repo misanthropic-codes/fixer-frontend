@@ -5,9 +5,18 @@ import Link from "next/link";
 
 const NAV_LINKS = ["Services", "Catalog", "Support"] as const;
 
+/* ── Bottom nav items (mobile only) ── */
+const BOTTOM_NAV = [
+  { label: "Home",     icon: "home",               href: "/" },
+  { label: "Services", icon: "home_repair_service", href: "#services" },
+  // center slot — Book — rendered separately
+  { label: "Catalog",  icon: "storefront",          href: "#catalog" },
+  { label: "Support",  icon: "support_agent",       href: "#support" },
+] as const;
+
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled]     = useState(false);
+  const [activeTab, setActiveTab]   = useState("Home");
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -17,93 +26,199 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        scrolled
-          ? "glass shadow-sm border-b border-outline-variant"
-          : "bg-transparent"
-      }`}
-    >
-      <nav className="flex justify-between items-center px-6 md:px-10 py-4 max-w-screen-2xl mx-auto">
-        {/* ── Logo + Links ── */}
-        <div className="flex items-center gap-10">
-          <Link
-            href="/"
-            className="text-2xl font-black tracking-tighter text-zinc-900 select-none"
-          >
+    <>
+      {/* ════════════════════════════════════════
+          DESKTOP — Full top navbar (md+)
+      ════════════════════════════════════════ */}
+      <header
+        className={`hidden md:block fixed top-0 w-full z-50 transition-all duration-300 ${
+          scrolled
+            ? "glass shadow-sm border-b border-outline-variant"
+            : "bg-transparent"
+        }`}
+      >
+        <nav className="flex justify-between items-center px-6 md:px-10 py-4 max-w-screen-2xl mx-auto">
+          {/* Logo + Links */}
+          <div className="flex items-center gap-10">
+            <Link href="/" className="text-2xl font-black tracking-tighter text-zinc-900 select-none">
+              Fixx<span className="text-primary">er</span>
+            </Link>
+
+            <ul className="flex gap-8 items-center">
+              {NAV_LINKS.map((item) => (
+                <li key={item}>
+                  <Link
+                    href={`#${item.toLowerCase()}`}
+                    className="relative text-zinc-500 hover:text-zinc-900 transition-colors font-label text-sm uppercase tracking-wider font-medium group"
+                  >
+                    {item}
+                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full rounded-full" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center gap-3">
+            <div className="hidden lg:flex items-center bg-surface-container rounded-full px-4 py-2.5 border border-outline gap-2 transition-all duration-200 focus-within:border-primary/30 focus-within:shadow-sm">
+              <span className="material-symbols-outlined text-on-surface-variant text-xl">search</span>
+              <input
+                type="text"
+                placeholder="Search parts…"
+                className="bg-transparent border-none outline-none text-sm w-44 text-on-surface placeholder:text-on-surface-variant"
+              />
+            </div>
+
+            <button className="group relative bg-primary text-on-primary px-6 h-11 rounded-xl font-bold text-sm overflow-hidden uppercase tracking-wide shadow-lg shadow-primary/15 transition-all duration-200 hover:shadow-xl hover:shadow-primary/25 hover:scale-[0.97] active:scale-95">
+              <span className="relative z-10">Book Repair</span>
+              <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+            </button>
+          </div>
+        </nav>
+      </header>
+
+      {/* ════════════════════════════════════════
+          MOBILE — Minimal top bar
+      ════════════════════════════════════════ */}
+      <header
+        className={`md:hidden fixed top-0 w-full z-50 transition-all duration-300 ${
+          scrolled ? "glass shadow-sm border-b border-outline-variant" : "bg-white/90 backdrop-blur-sm"
+        }`}
+      >
+        <div className="flex items-center justify-between px-5 py-3.5">
+          {/* Brand */}
+          <Link href="/" className="text-xl font-black tracking-tighter text-zinc-900 select-none">
             Fixx<span className="text-primary">er</span>
           </Link>
 
-          <ul className="hidden md:flex gap-8 items-center">
-            {NAV_LINKS.map((item) => (
-              <li key={item}>
-                <Link
-                  href={`#${item.toLowerCase()}`}
-                  className="relative text-zinc-500 hover:text-zinc-900 transition-colors font-label text-sm uppercase tracking-wider font-medium group"
-                >
-                  {item}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full rounded-full" />
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
+          {/* Right actions */}
+          <div className="flex items-center gap-1">
+            {/* Notification */}
+            <button className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors">
+              <span className="material-symbols-outlined text-zinc-600 text-[22px]">notifications</span>
+              {/* Unread dot */}
+              <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full border-2 border-white" />
+            </button>
 
-        {/* ── Actions ── */}
-        <div className="flex items-center gap-3">
-          {/* Search bar */}
-          <div className="hidden lg:flex items-center bg-surface-container rounded-full px-4 py-2.5 border border-outline gap-2 transition-all duration-200 focus-within:border-primary/30 focus-within:shadow-sm focus-within:shadow-primary/5">
-            <span className="material-symbols-outlined text-on-surface-variant text-xl">
-              search
-            </span>
-            <input
-              type="text"
-              placeholder="Search parts…"
-              className="bg-transparent border-none outline-none text-sm w-44 text-on-surface placeholder:text-on-surface-variant"
-            />
+            {/* Profile */}
+            <button className="w-10 h-10 flex items-center justify-center rounded-full bg-primary-container hover:bg-primary hover:text-white transition-all duration-200 group">
+              <span className="material-symbols-outlined icon-filled text-primary group-hover:text-white text-[22px] transition-colors">
+                account_circle
+              </span>
+            </button>
           </div>
+        </div>
+      </header>
 
-          {/* CTA */}
-          <button className="group relative bg-primary text-on-primary px-6 h-11 rounded-xl font-bold text-sm overflow-hidden uppercase tracking-wide shadow-lg shadow-primary/15 transition-all duration-200 hover:shadow-xl hover:shadow-primary/25 hover:scale-[0.97] active:scale-95">
-            <span className="relative z-10">Book Repair</span>
-            <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-          </button>
+      {/* ════════════════════════════════════════
+          MOBILE — Bottom navigation bar
+      ════════════════════════════════════════ */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50">
+        {/* Soft shadow above */}
+        <div className="absolute -top-4 left-0 right-0 h-4 bg-gradient-to-t from-black/5 to-transparent pointer-events-none" />
 
-          {/* Mobile toggle */}
-          <button
-            onClick={() => setMenuOpen((o) => !o)}
-            className="md:hidden p-2 rounded-lg text-zinc-700 hover:bg-surface-container transition-colors"
-            aria-label="Toggle menu"
-          >
-            <span className="material-symbols-outlined">
-              {menuOpen ? "close" : "menu"}
-            </span>
-          </button>
+        <div className="glass border-t border-outline-variant/60 px-2 pb-safe">
+          <div className="flex items-end justify-around px-1 pt-2 pb-2 relative">
+
+            {/* Left two items */}
+            {BOTTOM_NAV.slice(0, 2).map(({ label, icon, href }) => (
+              <BottomTab
+                key={label}
+                label={label}
+                icon={icon}
+                href={href}
+                active={activeTab === label}
+                onClick={() => setActiveTab(label)}
+              />
+            ))}
+
+            {/* ── Center: BOOK button ── */}
+            <div className="flex flex-col items-center -mt-6 relative z-10">
+              <button
+                onClick={() => setActiveTab("Book")}
+                className={`w-16 h-16 rounded-full bg-primary flex items-center justify-center shadow-xl shadow-primary/35
+                  ring-4 ring-white transition-all duration-200 active:scale-95
+                  ${activeTab === "Book" ? "scale-95 shadow-primary/50" : "hover:scale-105"}`}
+              >
+                <span className="material-symbols-outlined icon-filled text-white text-2xl">
+                  calendar_add_on
+                </span>
+              </button>
+              <span
+                className={`text-[10px] font-bold uppercase tracking-wider mt-1.5 ${
+                  activeTab === "Book" ? "text-primary" : "text-zinc-400"
+                }`}
+              >
+                Book
+              </span>
+            </div>
+
+            {/* Right two items */}
+            {BOTTOM_NAV.slice(2).map(({ label, icon, href }) => (
+              <BottomTab
+                key={label}
+                label={label}
+                icon={icon}
+                href={href}
+                active={activeTab === label}
+                onClick={() => setActiveTab(label)}
+              />
+            ))}
+          </div>
         </div>
       </nav>
+    </>
+  );
+}
 
-      {/* ── Mobile Menu ── */}
+/* ── Bottom tab item ── */
+function BottomTab({
+  label,
+  icon,
+  href,
+  active,
+  onClick,
+}: {
+  label: string;
+  icon: string;
+  href: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <Link
+      href={href}
+      onClick={onClick}
+      className="flex flex-col items-center gap-1 py-1 px-3 min-w-[56px] transition-all duration-200"
+    >
+      {/* Icon container */}
       <div
-        className={`md:hidden glass border-t border-outline-variant overflow-hidden transition-all duration-300 ${
-          menuOpen ? "max-h-60 opacity-100" : "max-h-0 opacity-0"
+        className={`relative w-10 h-8 flex items-center justify-center rounded-full transition-all duration-200 ${
+          active ? "bg-primary-container scale-110" : ""
         }`}
       >
-        <div className="px-6 py-4 flex flex-col gap-1">
-          {NAV_LINKS.map((item) => (
-            <Link
-              key={item}
-              href={`#${item.toLowerCase()}`}
-              onClick={() => setMenuOpen(false)}
-              className="py-3 text-zinc-700 font-medium uppercase tracking-wider text-sm border-b border-outline-variant last:border-0 hover:text-primary transition-colors"
-            >
-              {item}
-            </Link>
-          ))}
-          <button className="mt-3 w-full bg-primary text-white py-3 rounded-xl font-bold uppercase tracking-wide text-sm">
-            Book Repair
-          </button>
-        </div>
+        <span
+          className={`material-symbols-outlined text-[22px] transition-all duration-200 ${
+            active ? "icon-filled text-primary" : "text-zinc-400"
+          }`}
+        >
+          {icon}
+        </span>
+
+        {/* Active indicator pill */}
+        {active && (
+          <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary rounded-full" />
+        )}
       </div>
-    </header>
+
+      <span
+        className={`text-[10px] font-bold uppercase tracking-wider leading-none transition-colors duration-200 ${
+          active ? "text-primary" : "text-zinc-400"
+        }`}
+      >
+        {label}
+      </span>
+    </Link>
   );
 }

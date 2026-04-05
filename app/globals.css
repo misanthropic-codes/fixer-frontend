@@ -134,3 +134,16 @@ body {
 .delay-500 { animation-delay: 500ms; }
 .delay-600 { animation-delay: 600ms; }
 .delay-700 { animation-delay: 700ms; }
+
+/* ─── Safe area (iOS notch) ──────────────────────────────────── */
+.pb-safe {
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+}
+
+/* ─── Mobile bottom nav active indicator ─────────────────────── */
+@media (max-width: 767px) {
+  body {
+    /* Prevent content from sitting under the fixed mobile top bar */
+    padding-top: 60px;
+  }
+}

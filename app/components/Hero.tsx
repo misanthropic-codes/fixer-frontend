@@ -55,7 +55,7 @@ export default function Hero() {
   useEffect(() => { setMounted(true); }, []);
 
   return (
-    <section className="relative min-h-[88vh] flex items-center bg-white overflow-hidden pt-20">
+    <section className="relative min-h-[88vh] flex items-center bg-white overflow-hidden pt-4 md:pt-20">
       {/* Ambient blobs */}
       <div className="pointer-events-none">
         <div className="absolute top-0 left-0 w-[600px] h-[600px] bg-primary-container/25 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/4" />
