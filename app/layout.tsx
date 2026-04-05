@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Newsreader } from "next/font/google";
+import { BookingProvider } from "@/app/context/BookingContext";
+import BookingModal from "@/app/components/BookingModal";
 import "./globals.css";
 
 const inter = Inter({
@@ -39,7 +41,12 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
         />
       </head>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <BookingProvider>
+          {children}
+          <BookingModal />
+        </BookingProvider>
+      </body>
     </html>
   );
 }

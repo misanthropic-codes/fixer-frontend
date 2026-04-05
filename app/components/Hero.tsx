@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { useBooking } from "@/app/context/BookingContext";
 
 const HERO_IMAGE =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuDA9mgV-aJUlhsUCFdpsjAh68ldSYuVZG2VUmsj7OENR0BXA1gTDTblJEOs-o4QuxoYqOB3ATEbqXfQnlhhnTZfaLr4GrDJKb_KKZNCgj4MuVslFnjNnpt2vimmj3KSRaUMnWW3aOKkFhPUbZYgwTswXCRlDchT9CFwlo-S87VSmDqAODSSoXuAhh3nRB-oLg8wsMqBtMAbN7re1oHbiaipdcAUnMuDbw2bg8bMhqlgrPfpSIcTXcmvTpPQ3uPQ1jSpFqSg9IrarOA";
@@ -52,6 +54,7 @@ const STATS = [
 
 export default function Hero() {
   const [mounted, setMounted] = useState(false);
+  const { openBooking } = useBooking();
   useEffect(() => { setMounted(true); }, []);
 
   return (
@@ -109,15 +112,21 @@ export default function Hero() {
               mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
-            <button className="group relative bg-primary text-on-primary px-8 h-14 rounded-xl font-extrabold text-base overflow-hidden shadow-xl shadow-primary/20 flex items-center justify-center gap-2 transition-all duration-200 hover:scale-[0.97] hover:shadow-2xl hover:shadow-primary/30 active:scale-95">
+            <button 
+              onClick={() => openBooking()}
+              className="group relative bg-primary text-on-primary px-8 h-14 rounded-xl font-extrabold text-base overflow-hidden shadow-xl shadow-primary/20 flex items-center justify-center gap-2 transition-all duration-200 hover:scale-[0.97] hover:shadow-2xl hover:shadow-primary/30 active:scale-95"
+            >
               <span className="material-symbols-outlined icon-filled text-xl">build</span>
               <span>Book Repair Service</span>
               <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
             </button>
-            <button className="bg-white text-on-surface border-2 border-outline px-8 h-14 rounded-xl font-bold text-base flex items-center justify-center gap-2 transition-all duration-200 hover:bg-surface-container hover:border-primary/20 hover:scale-[0.97] active:scale-95">
+            <Link 
+              href="/services"
+              className="bg-white text-on-surface border-2 border-outline px-8 h-14 rounded-xl font-bold text-base flex items-center justify-center gap-2 transition-all duration-200 hover:bg-surface-container hover:border-primary/20 hover:scale-[0.97] active:scale-95"
+            >
               <span className="material-symbols-outlined text-xl">storefront</span>
-              <span>Browse Spare Parts</span>
-            </button>
+              <span>Browse Services</span>
+            </Link>
           </div>
 
           {/* Stats - Hidden or reduced on small mobile if needed, but keeping for now */}

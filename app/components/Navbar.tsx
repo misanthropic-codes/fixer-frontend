@@ -2,8 +2,14 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useBooking } from "@/app/context/BookingContext";
 
-const NAV_LINKS = ["Services", "Catalog", "Support"] as const;
+const NAV_LINKS = [
+  { label: "Home", href: "/" },
+  { label: "Services", href: "/services" },
+  { label: "Catalog", href: "/services" },
+  { label: "Support", href: "#support" },
+] as const;
 
 /* ── Bottom nav items (mobile only) ── */
 const BOTTOM_NAV = [
@@ -15,8 +21,9 @@ const BOTTOM_NAV = [
 ] as const;
 
 export default function Navbar() {
-  const [scrolled, setScrolled]     = useState(false);
-  const [activeTab, setActiveTab]   = useState("Home");
+  const [scrolled, setScrolled] = useState(false);
+  const [activeTab, setActiveTab] = useState("Home");
+  const { openBooking } = useBooking();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -45,13 +52,13 @@ export default function Navbar() {
             </Link>
 
             <ul className="flex gap-8 items-center">
-              {NAV_LINKS.map((item) => (
-                <li key={item}>
+              {NAV_LINKS.slice(1).map((item) => (
+                <li key={item.label}>
                   <Link
-                    href={`#${item.toLowerCase()}`}
+                    href={item.href}
                     className="relative text-zinc-500 hover:text-zinc-900 transition-colors font-label text-sm uppercase tracking-wider font-medium group"
                   >
-                    {item}
+                    {item.label}
                     <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full rounded-full" />
                   </Link>
                 </li>
@@ -70,7 +77,10 @@ export default function Navbar() {
               />
             </div>
 
-            <button className="group relative bg-primary text-on-primary px-6 h-11 rounded-xl font-bold text-sm overflow-hidden uppercase tracking-wide shadow-lg shadow-primary/15 transition-all duration-200 hover:shadow-xl hover:shadow-primary/25 hover:scale-[0.97] active:scale-95">
+            <button 
+              onClick={() => openBooking()}
+              className="group relative bg-primary text-on-primary px-6 h-11 rounded-xl font-bold text-sm overflow-hidden uppercase tracking-wide shadow-lg shadow-primary/15 transition-all duration-200 hover:shadow-xl hover:shadow-primary/25 hover:scale-[0.97] active:scale-95"
+            >
               <span className="relative z-10">Book Repair</span>
               <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
             </button>
@@ -133,7 +143,10 @@ export default function Navbar() {
             {/* ── Center: BOOK button (Elevated) ── */}
             <div className="relative flex flex-col items-center -mt-8">
               <button
-                onClick={() => setActiveTab("Book")}
+                onClick={() => {
+                  setActiveTab("Book");
+                  openBooking();
+                }}
                 className={`w-14 h-14 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/30
                   border-[3px] border-white transition-all duration-200 active:scale-95
                   ${activeTab === "Book" ? "shadow-primary/40 bg-zinc-900" : "hover:scale-105"}`}
