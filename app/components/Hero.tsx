@@ -62,7 +62,7 @@ export default function Hero() {
         <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-secondary-container/20 rounded-full blur-[100px] translate-x-1/3 translate-y-1/4" />
       </div>
 
-      <div className="container mx-auto px-6 md:px-10 max-w-screen-2xl flex flex-col lg:flex-row items-center gap-10 lg:gap-20 py-10 lg:py-16">
+      <div className="container mx-auto px-6 md:px-10 max-w-screen-2xl flex flex-col lg:flex-row items-center gap-10 lg:gap-20 py-8 lg:py-16">
         
         {/* ── Content (Now First for Mobile) ── */}
         <div className="w-full lg:w-1/2 flex flex-col order-first lg:order-none">

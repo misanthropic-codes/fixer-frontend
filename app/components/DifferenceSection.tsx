@@ -41,11 +41,11 @@ export default function DifferenceSection() {
   return (
     <section
       id="services"
-      className="py-16 md:py-28 bg-surface-container-low carbon-texture relative overflow-hidden"
+      className="pt-10 pb-8 md:py-28 bg-surface-container-low carbon-texture relative overflow-hidden"
     >
       <div className="relative z-10 container mx-auto px-6 md:px-10 max-w-screen-2xl">
         {/* Header */}
-        <div className="flex flex-col md:flex-row items-center md:items-end justify-between mb-10 md:mb-16 gap-4 md:gap-5">
+        <div className="flex flex-col md:flex-row items-center md:items-end justify-between mb-8 md:mb-16 gap-4 md:gap-5">
           <div className="text-center md:text-left">
             <h2 className="font-headline text-4xl md:text-6xl text-on-surface tracking-tight leading-tight">
               The <span className="italic text-primary">Fixxer</span> Difference

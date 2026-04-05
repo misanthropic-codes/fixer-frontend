@@ -159,7 +159,6 @@ export default function Navbar() {
                 icon={icon}
                 href={href}
                 active={activeTab === label}
-                activeTab={activeTab === label}
                 onClick={() => setActiveTab(label)}
               />
             ))}

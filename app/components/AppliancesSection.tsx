@@ -33,10 +33,10 @@ const APPLIANCES = [
 
 export default function AppliancesSection() {
   return (
-    <section id="catalog" className="py-16 md:py-32 bg-surface">
+    <section id="catalog" className="pt-8 pb-10 md:py-32 bg-surface">
       <div className="container mx-auto px-6 md:px-10 max-w-screen-2xl">
         {/* Header */}
-        <div className="text-center max-w-2xl mx-auto mb-12 md:mb-20">
+        <div className="text-center max-w-2xl mx-auto mb-10 md:mb-20">
           <p className="font-label text-[10px] md:text-xs uppercase tracking-[0.28em] font-bold text-on-surface-variant mb-4">
             What we fix
           </p>
