@@ -62,66 +62,13 @@ export default function Hero() {
         <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-secondary-container/20 rounded-full blur-[100px] translate-x-1/3 translate-y-1/4" />
       </div>
 
-      <div className="container mx-auto px-6 md:px-10 max-w-screen-2xl flex flex-col lg:flex-row items-center gap-12 lg:gap-20 py-16">
-        {/* ── Left: Image card ── */}
-        <div
-          className={`w-full lg:w-1/2 relative transition-all duration-700 ${
-            mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}
-        >
-          {/* Card */}
-          <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl shadow-zinc-200/80 aspect-[4/5] lg:h-[660px] lg:aspect-auto group">
-            <Image
-              src={HERO_IMAGE}
-              alt="A master technician in a navy Fixxer uniform expertly repairing a high-end appliance in a modern luxury kitchen"
-              fill
-              priority
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-            />
-            {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/5 to-transparent" />
-
-            {/* Trust badge */}
-            <div className="absolute bottom-8 left-8 right-8">
-              <div className="bg-white/92 backdrop-blur-md p-5 rounded-2xl border border-white/30 shadow-xl flex items-center gap-4 transition-all duration-300 hover:bg-white/98">
-                <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white flex-shrink-0 shadow-lg shadow-primary/30">
-                  <span className="material-symbols-outlined icon-filled">verified</span>
-                </div>
-                <div>
-                  <p className="font-bold text-zinc-900 leading-tight">Master Technician</p>
-                  <p className="text-xs text-zinc-500 uppercase tracking-widest font-bold mt-0.5">
-                    Background Checked
-                  </p>
-                </div>
-                <div className="ml-auto">
-                  <div className="flex gap-0.5">
-                    {[...Array(5)].map((_, i) => (
-                      <span key={i} className="material-symbols-outlined icon-filled text-secondary text-base">star</span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Floating stat pill */}
-          <div className="absolute -top-4 -right-6 hidden lg:flex bg-white rounded-2xl shadow-xl shadow-zinc-200/60 px-5 py-4 items-center gap-3 border border-outline-variant animate-fade-in delay-700">
-            <div className="w-10 h-10 rounded-xl bg-primary-container flex items-center justify-center">
-              <span className="material-symbols-outlined text-primary icon-filled text-xl">schedule</span>
-            </div>
-            <div>
-              <p className="text-sm font-bold text-zinc-900 leading-tight">30 min arrival</p>
-              <p className="text-xs text-zinc-400 font-medium">Avg. response time</p>
-            </div>
-          </div>
-        </div>
-
-        {/* ── Right: Content ── */}
-        <div className="w-full lg:w-1/2 flex flex-col">
+      <div className="container mx-auto px-6 md:px-10 max-w-screen-2xl flex flex-col lg:flex-row items-center gap-10 lg:gap-20 py-10 lg:py-16">
+        
+        {/* ── Content (Now First for Mobile) ── */}
+        <div className="w-full lg:w-1/2 flex flex-col order-first lg:order-none">
           {/* Badge */}
           <span
-            className={`inline-flex self-start items-center px-4 py-1.5 rounded-full bg-primary-container text-primary font-bold text-[10px] uppercase tracking-[0.2em] mb-7 transition-all duration-500 delay-100 ${
+            className={`inline-flex self-start items-center px-4 py-1.5 rounded-full bg-primary-container text-primary font-bold text-[10px] uppercase tracking-[0.2em] mb-5 lg:mb-7 transition-all duration-500 delay-100 ${
               mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
@@ -131,7 +78,7 @@ export default function Hero() {
 
           {/* Headline */}
           <h1
-            className={`font-headline text-[3.5rem] md:text-[4.5rem] lg:text-[5.5rem] text-on-surface leading-[0.92] tracking-tighter mb-7 transition-all duration-600 delay-200 ${
+            className={`font-headline text-[3rem] md:text-[4.5rem] lg:text-[5.5rem] text-on-surface leading-[0.95] lg:leading-[0.92] tracking-tighter mb-5 lg:mb-7 transition-all duration-600 delay-200 ${
               mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             }`}
           >
@@ -139,13 +86,13 @@ export default function Hero() {
             <span className="italic text-primary">Fixxer</span>
             <br />
             for Expert
-            <br />
-            Repair.
+            <br className="hidden lg:block" />
+            {" "}Repair.
           </h1>
 
           {/* Subhead */}
           <p
-            className={`text-lg md:text-xl text-on-surface-variant max-w-lg mb-10 leading-relaxed transition-all duration-600 delay-300 ${
+            className={`text-base md:text-xl text-on-surface-variant max-w-lg mb-8 lg:mb-10 leading-relaxed transition-all duration-600 delay-300 ${
               mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
@@ -158,7 +105,7 @@ export default function Hero() {
 
           {/* CTAs */}
           <div
-            className={`flex flex-col sm:flex-row gap-4 mb-12 transition-all duration-600 delay-400 ${
+            className={`flex flex-col sm:flex-row gap-4 mb-10 lg:mb-12 transition-all duration-600 delay-400 ${
               mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
@@ -173,15 +120,15 @@ export default function Hero() {
             </button>
           </div>
 
-          {/* Stats */}
+          {/* Stats - Hidden or reduced on small mobile if needed, but keeping for now */}
           <div
-            className={`pt-8 border-t border-outline flex gap-10 transition-all duration-600 delay-500 ${
+            className={`pt-6 lg:pt-8 border-t border-outline flex gap-8 lg:gap-10 transition-all duration-600 delay-500 ${
               mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
             {STATS.map(({ display, suffix, label }, i) => (
               <div key={label} className="group">
-                <p className="text-3xl font-headline font-bold text-on-surface tabular-nums">
+                <p className="text-2xl lg:text-3xl font-headline font-bold text-on-surface tabular-nums">
                   {mounted ? (
                     <>
                       {display}
@@ -191,13 +138,50 @@ export default function Hero() {
                     `${display}${suffix}`
                   )}
                 </p>
-                <p className="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant mt-1">
+                <p className="text-[9px] lg:text-[10px] uppercase tracking-widest font-bold text-on-surface-variant mt-1">
                   {label}
                 </p>
               </div>
             ))}
           </div>
         </div>
+
+        {/* ── Image Card (Below on Mobile, Smaller) ── */}
+        <div
+          className={`w-full lg:w-1/2 relative transition-all duration-700 ${
+            mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          }`}
+        >
+          {/* Card - Reduced aspect ratio on mobile */}
+          <div className="relative rounded-[2rem] lg:rounded-[2.5rem] overflow-hidden shadow-2xl shadow-zinc-200/80 aspect-video lg:aspect-auto lg:h-[660px] group">
+            <Image
+              src={HERO_IMAGE}
+              alt="A master technician in a navy Fixxer uniform expertly repairing a high-end appliance"
+              fill
+              priority
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+            />
+            {/* Gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/5 to-transparent" />
+
+            {/* Trust badge - Smaller on mobile */}
+            <div className="absolute bottom-4 left-4 right-4 lg:bottom-8 lg:left-8 lg:right-8">
+              <div className="bg-white/92 backdrop-blur-md p-3 lg:p-5 rounded-xl lg:rounded-2xl border border-white/30 shadow-xl flex items-center gap-3 lg:gap-4 transition-all duration-300">
+                <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-primary flex items-center justify-center text-white flex-shrink-0">
+                  <span className="material-symbols-outlined icon-filled text-lg lg:text-xl">verified</span>
+                </div>
+                <div>
+                  <p className="font-bold text-sm lg:text-base text-zinc-900 leading-tight">Master Technician</p>
+                  <p className="text-[9px] lg:text-xs text-zinc-500 uppercase tracking-widest font-bold mt-0.5">
+                    Background Checked
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </section>
   );

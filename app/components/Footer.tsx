@@ -6,17 +6,20 @@ const LEGAL_LINKS = ["Privacy Policy", "Terms of Service"];
 export default function Footer() {
   return (
     <footer className="bg-zinc-50 border-t border-zinc-200">
-      <div className="max-w-screen-2xl mx-auto px-6 md:px-10 pt-16 pb-10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 pb-12 border-b border-zinc-200/70">
-          {/* Brand */}
-          <div className="space-y-5">
+      <div className="max-w-screen-2xl mx-auto px-6 md:px-10 pt-12 md:pt-16 pb-8 md:pb-10">
+        
+        {/* Main Footer Content */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12 pb-10 md:pb-12 border-b border-zinc-200/70">
+          
+          {/* Brand & Description */}
+          <div className="space-y-4 md:space-y-5">
             <Link
               href="/"
-              className="text-2xl font-black tracking-tighter text-zinc-900"
+              className="text-2xl font-black tracking-tighter text-zinc-900 select-none"
             >
               Fixx<span className="text-primary">er</span>
             </Link>
-            <p className="text-zinc-500 text-sm leading-relaxed max-w-xs">
+            <p className="text-zinc-500 text-sm leading-relaxed max-w-xs opacity-90">
               Professional grade technical mastery for the modern home.
               Licensed, bonded, and local to your neighborhood.
             </p>
@@ -31,26 +34,26 @@ export default function Footer() {
                 <button
                   key={label}
                   aria-label={label}
-                  className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-500 hover:bg-primary hover:text-white transition-all duration-200 hover:scale-110 hover:shadow-lg hover:shadow-primary/20"
+                  className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-500 hover:bg-primary hover:text-white transition-all duration-200"
                 >
-                  <span className="material-symbols-outlined text-lg">{icon}</span>
+                  <span className="material-symbols-outlined text-base md:text-lg">{icon}</span>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Links */}
-          <div className="grid grid-cols-2 gap-8">
+          {/* Link Clusters: 2 columns on mobile for tight layout */}
+          <div className="grid grid-cols-2 gap-6 md:gap-8">
             <div>
-              <h4 className="font-label text-xs font-black uppercase tracking-[0.22em] text-zinc-400 mb-5">
+              <h4 className="font-label text-[10px] md:text-xs font-black uppercase tracking-[0.22em] text-zinc-400 mb-4 md:mb-5">
                 Explore
               </h4>
-              <ul className="space-y-3">
+              <ul className="space-y-2.5 md:space-y-3">
                 {EXPLORE_LINKS.map((item) => (
                   <li key={item}>
                     <Link
                       href="#"
-                      className="font-label text-sm text-zinc-500 hover:text-primary transition-colors duration-200 hover:translate-x-0.5 inline-block"
+                      className="font-label text-sm text-zinc-500 hover:text-primary transition-colors duration-200 inline-block"
                     >
                       {item}
                     </Link>
@@ -59,15 +62,15 @@ export default function Footer() {
               </ul>
             </div>
             <div>
-              <h4 className="font-label text-xs font-black uppercase tracking-[0.22em] text-zinc-400 mb-5">
+              <h4 className="font-label text-[10px] md:text-xs font-black uppercase tracking-[0.22em] text-zinc-400 mb-4 md:mb-5">
                 Legal
               </h4>
-              <ul className="space-y-3">
+              <ul className="space-y-2.5 md:space-y-3">
                 {LEGAL_LINKS.map((item) => (
                   <li key={item}>
                     <Link
                       href="#"
-                      className="font-label text-sm text-zinc-500 hover:text-primary transition-colors duration-200 hover:translate-x-0.5 inline-block"
+                      className="font-label text-sm text-zinc-500 hover:text-primary transition-colors duration-200 inline-block"
                     >
                       {item}
                     </Link>
@@ -77,60 +80,60 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Contact */}
+          {/* Contact Actions (Fixed for mobile) */}
           <div id="support">
-            <h4 className="font-label text-xs font-black uppercase tracking-[0.22em] text-zinc-400 mb-5">
+            <h4 className="font-label text-[10px] md:text-xs font-black uppercase tracking-[0.22em] text-zinc-400 mb-4 md:mb-5">
               Contact Us
             </h4>
-            <div className="space-y-5">
-              <div className="flex items-start gap-3 group cursor-pointer">
-                <div className="w-9 h-9 rounded-xl bg-primary-container flex items-center justify-center flex-shrink-0 group-hover:bg-primary transition-colors duration-200">
-                  <span className="material-symbols-outlined text-primary group-hover:text-white transition-colors duration-200 text-lg icon-filled">
+            <div className="space-y-4">
+              <div className="flex items-start gap-3 group">
+                <div className="w-8 h-8 md:w-9 md:h-9 rounded-lg md:rounded-xl bg-primary-container flex items-center justify-center flex-shrink-0 group-active:bg-primary transition-colors">
+                  <span className="material-symbols-outlined text-primary group-active:text-white text-base md:text-lg icon-filled">
                     call
                   </span>
                 </div>
                 <div>
                   <p className="font-bold text-zinc-800 text-sm">1-800-FIXXER-PRO</p>
-                  <p className="text-zinc-500 text-xs mt-0.5">24/7 Emergency Dispatch</p>
+                  <p className="text-zinc-500 text-[10px] md:text-xs mt-0.5">24/7 Dispatch</p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 group cursor-pointer">
-                <div className="w-9 h-9 rounded-xl bg-primary-container flex items-center justify-center flex-shrink-0 group-hover:bg-primary transition-colors duration-200">
-                  <span className="material-symbols-outlined text-primary group-hover:text-white transition-colors duration-200 text-lg icon-filled">
+              <div className="flex items-start gap-3 group">
+                <div className="w-8 h-8 md:w-9 md:h-9 rounded-lg md:rounded-xl bg-primary-container flex items-center justify-center flex-shrink-0 group-active:bg-primary transition-colors">
+                  <span className="material-symbols-outlined text-primary group-active:text-white text-base md:text-lg icon-filled">
                     location_on
                   </span>
                 </div>
                 <div>
-                  <p className="font-bold text-zinc-800 text-sm">Downtown Service Hub</p>
-                  <p className="text-zinc-500 text-xs mt-0.5">422 Artisan Way, Suite 100</p>
+                  <p className="font-bold text-zinc-800 text-sm">Downtown Hub</p>
+                  <p className="text-zinc-500 text-[10px] md:text-xs mt-0.5">422 Artisan Way</p>
                 </div>
               </div>
 
-              {/* CTA strip */}
-              <button className="w-full mt-4 bg-primary text-white py-3 rounded-xl font-bold text-sm uppercase tracking-wide hover:opacity-90 hover:scale-[0.98] transition-all duration-200 shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
+              {/* Mobile CTA: Large, accessible button */}
+              <button className="w-full mt-2 bg-primary text-white py-3.5 rounded-xl font-bold text-sm uppercase tracking-wide hover:opacity-90 active:scale-95 transition-all duration-200 shadow-md shadow-primary/10 flex items-center justify-center gap-2">
                 <span className="material-symbols-outlined text-base icon-filled">build</span>
-                Book a Repair Now
+                Book a Repair
               </button>
             </div>
           </div>
         </div>
 
-        {/* Bottom bar */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-zinc-400 font-label text-[10px] uppercase tracking-[0.2em]">
+        {/* Bottom Credits Bar */}
+        <div className="pt-6 md:pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-zinc-400 font-label text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-center md:text-left">
             © 2024 Fixxer Technical Mastery. All rights reserved.
           </p>
           <div className="flex items-center gap-2 text-zinc-400">
-            <span className="material-symbols-outlined text-base text-primary icon-filled">
+            <span className="material-symbols-outlined text-sm md:text-base text-primary icon-filled">
               favorite
             </span>
-            <span className="text-[10px] uppercase tracking-wider font-bold">
+            <span className="text-[9px] md:text-[10px] uppercase tracking-wider font-bold">
               Made for your neighborhood
             </span>
           </div>
         </div>
       </div>
-    </footer>
+    </footer >
   );
 }

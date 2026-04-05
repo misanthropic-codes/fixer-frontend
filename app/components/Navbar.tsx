@@ -83,10 +83,10 @@ export default function Navbar() {
       ════════════════════════════════════════ */}
       <header
         className={`md:hidden fixed top-0 w-full z-50 transition-all duration-300 ${
-          scrolled ? "glass shadow-sm border-b border-outline-variant" : "bg-white/90 backdrop-blur-sm"
+          scrolled ? "glass shadow-sm border-b border-outline-variant" : "bg-white/95 backdrop-blur-sm shadow-sm"
         }`}
       >
-        <div className="flex items-center justify-between px-5 py-3.5">
+        <div className="flex items-center justify-between px-5 py-3">
           {/* Brand */}
           <Link href="/" className="text-xl font-black tracking-tighter text-zinc-900 select-none">
             Fixx<span className="text-primary">er</span>
@@ -95,15 +95,15 @@ export default function Navbar() {
           {/* Right actions */}
           <div className="flex items-center gap-1">
             {/* Notification */}
-            <button className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors">
-              <span className="material-symbols-outlined text-zinc-600 text-[22px]">notifications</span>
+            <button className="relative w-9 h-9 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors">
+              <span className="material-symbols-outlined text-zinc-600 text-[20px]">notifications</span>
               {/* Unread dot */}
-              <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full border-2 border-white" />
+              <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-primary rounded-full border-2 border-white" />
             </button>
 
             {/* Profile */}
-            <button className="w-10 h-10 flex items-center justify-center rounded-full bg-primary-container hover:bg-primary hover:text-white transition-all duration-200 group">
-              <span className="material-symbols-outlined icon-filled text-primary group-hover:text-white text-[22px] transition-colors">
+            <button className="w-9 h-9 flex items-center justify-center rounded-full bg-primary-container hover:bg-primary transition-all duration-200 group">
+              <span className="material-symbols-outlined icon-filled text-primary group-hover:text-white text-[20px] transition-colors">
                 account_circle
               </span>
             </button>
@@ -112,14 +112,11 @@ export default function Navbar() {
       </header>
 
       {/* ════════════════════════════════════════
-          MOBILE — Bottom navigation bar
+          MOBILE — Bottom navigation bar (Urban Company style)
       ════════════════════════════════════════ */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50">
-        {/* Soft shadow above */}
-        <div className="absolute -top-4 left-0 right-0 h-4 bg-gradient-to-t from-black/5 to-transparent pointer-events-none" />
-
-        <div className="glass border-t border-outline-variant/60 px-2 pb-safe">
-          <div className="flex items-end justify-around px-1 pt-2 pb-2 relative">
+        <div className="bg-white/98 backdrop-blur-xl border-t border-outline-variant/50 px-1 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
+          <div className="flex items-center justify-around h-14 relative">
 
             {/* Left two items */}
             {BOTTOM_NAV.slice(0, 2).map(({ label, icon, href }) => (
@@ -133,21 +130,21 @@ export default function Navbar() {
               />
             ))}
 
-            {/* ── Center: BOOK button ── */}
-            <div className="flex flex-col items-center -mt-6 relative z-10">
+            {/* ── Center: BOOK button (Elevated) ── */}
+            <div className="relative flex flex-col items-center -mt-8">
               <button
                 onClick={() => setActiveTab("Book")}
-                className={`w-16 h-16 rounded-full bg-primary flex items-center justify-center shadow-xl shadow-primary/35
-                  ring-4 ring-white transition-all duration-200 active:scale-95
-                  ${activeTab === "Book" ? "scale-95 shadow-primary/50" : "hover:scale-105"}`}
+                className={`w-14 h-14 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/30
+                  border-[3px] border-white transition-all duration-200 active:scale-95
+                  ${activeTab === "Book" ? "shadow-primary/40 bg-zinc-900" : "hover:scale-105"}`}
               >
                 <span className="material-symbols-outlined icon-filled text-white text-2xl">
                   calendar_add_on
                 </span>
               </button>
               <span
-                className={`text-[10px] font-bold uppercase tracking-wider mt-1.5 ${
-                  activeTab === "Book" ? "text-primary" : "text-zinc-400"
+                className={`text-[9px] font-bold uppercase tracking-wider mt-1 ${
+                  activeTab === "Book" ? "text-primary" : "text-zinc-500"
                 }`}
               >
                 Book
@@ -162,6 +159,7 @@ export default function Navbar() {
                 icon={icon}
                 href={href}
                 active={activeTab === label}
+                activeTab={activeTab === label}
                 onClick={() => setActiveTab(label)}
               />
             ))}
@@ -190,33 +188,18 @@ function BottomTab({
     <Link
       href={href}
       onClick={onClick}
-      className="flex flex-col items-center gap-1 py-1 px-3 min-w-[56px] transition-all duration-200"
+      className={`flex flex-col items-center justify-center gap-0.5 px-2 min-w-[64px] h-full transition-all duration-200 ${
+        active ? "text-primary" : "text-zinc-500"
+      }`}
     >
-      {/* Icon container */}
-      <div
-        className={`relative w-10 h-8 flex items-center justify-center rounded-full transition-all duration-200 ${
-          active ? "bg-primary-container scale-110" : ""
-        }`}
-      >
-        <span
-          className={`material-symbols-outlined text-[22px] transition-all duration-200 ${
-            active ? "icon-filled text-primary" : "text-zinc-400"
-          }`}
-        >
-          {icon}
-        </span>
-
-        {/* Active indicator pill */}
-        {active && (
-          <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary rounded-full" />
-        )}
-      </div>
-
       <span
-        className={`text-[10px] font-bold uppercase tracking-wider leading-none transition-colors duration-200 ${
-          active ? "text-primary" : "text-zinc-400"
+        className={`material-symbols-outlined text-[20px] transition-all duration-200 ${
+          active ? "icon-filled scale-110" : ""
         }`}
       >
+        {icon}
+      </span>
+      <span className="text-[9px] font-bold uppercase tracking-wider">
         {label}
       </span>
     </Link>
