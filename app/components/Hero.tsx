@@ -99,9 +99,7 @@ export default function Hero() {
               mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
-            India&apos;s trusted platform for appliance repair. Certified technicians at your door in{" "}
-            <span className="font-bold text-on-surface">30 minutes</span>. Transparent pricing with a{" "}
-            <span className="font-bold text-on-surface">60-day warranty</span>.
+            India&apos;s trusted platform for appliance repair. <span className="font-bold text-on-surface">60-day warranty</span> & <span className="font-bold text-on-surface">Appliance Insurance</span> included. Free service charge for a year & up to 50% off on every spare part.
           </p>
 
           {/* CTAs */}

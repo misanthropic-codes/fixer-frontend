@@ -19,9 +19,11 @@ export default function Footer() {
             >
               Fixx<span className="text-primary">er</span>
             </Link>
-            <p className="text-zinc-500 text-sm leading-relaxed max-w-xs opacity-90">
+            <p className="text-zinc-500 text-sm leading-relaxed max-w-xs opacity-90 text-balance">
               Professional grade technical mastery for the modern home.
-              Licensed, bonded, and local to your neighborhood.
+              <span className="block mt-2 font-bold text-zinc-900 italic">25 Years of Experience</span>
+              <span className="block mt-1 text-primary font-medium">Appliance Insurance Included:</span>
+              Free service charge for a year & up to 50% off on every spare part.
             </p>
 
             {/* Social buttons */}

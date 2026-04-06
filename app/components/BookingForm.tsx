@@ -118,17 +118,27 @@ export default function BookingForm({ initialService, onSuccess, className = "" 
 
       {/* Dynamic Price Display */}
       {selectedSubCategory && (
-        <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4 flex items-center justify-between animate-in fade-in slide-in-from-top-2 duration-300">
-           <div>
-              <p className="text-[9px] uppercase tracking-widest font-black text-primary">Standard Service Charge</p>
-              <p className="text-xl font-headline text-on-surface font-bold">{selectedSubCategory.price}</p>
+        <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4 flex flex-col gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+           <div className="flex items-center justify-between">
+              <div>
+                 <p className="text-[9px] uppercase tracking-widest font-black text-primary">Standard Service Charge</p>
+                 <p className="text-xl font-headline text-on-surface font-bold">{selectedSubCategory.price}</p>
+              </div>
+              <div className="text-right">
+                 <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider">
+                    <span className="material-symbols-outlined text-[10px] icon-filled">verified</span>
+                    60 Days Warranty
+                 </span>
+                 <p className="text-[10px] text-on-surface-variant mt-1">Visit fee included</p>
+              </div>
            </div>
-           <div className="text-right">
-              <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider">
-                 <span className="material-symbols-outlined text-[10px] icon-filled">verified</span>
-                 60 Days Warranty
-              </span>
-              <p className="text-[10px] text-on-surface-variant mt-1">Excludes spare parts</p>
+           <div className="pt-3 border-t border-primary/10">
+              <p className="text-[10px] font-medium text-on-surface-variant flex items-start gap-2">
+                 <span className="material-symbols-outlined text-sm text-primary">info</span>
+                 <span>
+                    <span className="font-bold text-on-surface">Dynamic Parts Cost:</span> Additional cost for parts (if required) will be displayed transparently before service completion. Approve pricing before we start.
+                 </span>
+              </p>
            </div>
         </div>
       )}
@@ -180,9 +190,15 @@ export default function BookingForm({ initialService, onSuccess, className = "" 
         )}
       </button>
       
-      <div className="bg-surface-container-highest/30 rounded-xl p-4 border border-outline-variant">
+      <div className="bg-surface-container-highest/30 rounded-xl p-4 border border-outline-variant space-y-3">
         <p className="text-[10px] font-medium text-on-surface-variant leading-relaxed">
-          <span className="font-bold text-on-surface">Transparent Pricing:</span> Customers view and approve part pricing before completion. 30 Days Warranty on selected parts. A diagnostic fee applies if repair is not performed.
+          <span className="font-bold text-on-surface block mb-1 uppercase tracking-wider text-[9px]">Warranty Terms</span>
+          • 60 Days Service Warranty on all repairs.<br/>
+          • Up to 30 Days Warranty on selected genuine spare parts.<br/>
+          • Transparent pricing: Approve part costs before service completion.
+        </p>
+        <p className="text-[9px] text-on-surface-variant/70 italic">
+          * A diagnostic fee applies if repair is not performed after inspection.
         </p>
       </div>
     </form>
