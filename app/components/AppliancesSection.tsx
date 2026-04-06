@@ -26,7 +26,7 @@ export default function AppliancesSection() {
         {/* Grid: 2 columns on mobile, 4 on large */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
           {SERVICES.map(({ id, name, startingPrice, image, slug }) => (
-            <div key={id} className="group cursor-pointer">
+            <div key={id} className="group cursor-pointer active:scale-[0.98] transition-transform duration-200">
               {/* Image Container */}
               <div className="relative aspect-[4/5] rounded-xl md:rounded-2xl overflow-hidden mb-3 md:mb-5 shadow-sm">
                 <Image
@@ -80,7 +80,7 @@ export default function AppliancesSection() {
         <div className="mt-12 md:mt-16 text-center">
           <Link 
             href="/services"
-            className="inline-flex items-center gap-2 border-2 border-outline text-on-surface px-6 md:px-8 h-11 md:h-13 rounded-xl font-bold text-xs md:text-sm uppercase tracking-wider hover:border-primary hover:text-primary transition-all duration-200 hover:scale-[0.97]"
+            className="inline-flex items-center gap-2 border-2 border-outline text-on-surface px-6 md:px-8 h-11 md:h-13 rounded-xl font-bold text-xs md:text-sm uppercase tracking-wider hover:border-primary hover:text-primary transition-all duration-200 hover:scale-[0.97] active:scale-95"
           >
             <span className="material-symbols-outlined text-lg md:text-xl">grid_view</span>
             View All Services

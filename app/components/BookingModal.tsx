@@ -34,7 +34,7 @@ export default function BookingModal() {
 
   return (
     <div
-      className={`fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 transition-all duration-300 ${
+      className={`fixed inset-0 z-[100] flex items-end sm:items-center justify-center transition-all duration-300 ${
         isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
       }`}
     >
@@ -48,15 +48,20 @@ export default function BookingModal() {
 
       {/* Modal Container */}
       <div
-        className={`relative w-full max-w-xl bg-white rounded-[2.5rem] shadow-2xl shadow-black/20 overflow-hidden transition-all duration-300 transform ${
-          isOpen ? "translate-y-0 scale-100 opacity-100" : "translate-y-8 scale-95 opacity-0"
+        className={`relative w-full max-w-xl bg-white rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl shadow-black/20 overflow-hidden transition-all duration-300 transform pb-safe ${
+          isOpen ? "translate-y-0 sm:scale-100 opacity-100" : "translate-y-full sm:translate-y-8 sm:scale-95 opacity-0"
         }`}
       >
+        {/* Drag Handle (Mobile only) */}
+        <div className="flex justify-center pt-4 sm:hidden">
+          <div className="w-10 h-1.5 bg-surface-container-highest rounded-full" />
+        </div>
+
         {/* Header */}
-        <div className="relative px-8 pt-10 pb-2 text-center">
+        <div className="relative px-6 sm:px-8 pt-6 sm:pt-10 pb-2 text-center">
           <button
             onClick={closeBooking}
-            className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors"
+            className="absolute top-4 sm:top-6 right-4 sm:right-6 w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors"
           >
             <span className="material-symbols-outlined text-on-surface-variant">close</span>
           </button>
@@ -66,16 +71,16 @@ export default function BookingModal() {
             <span className="text-[10px] font-black uppercase tracking-widest">Priority Dispatch</span>
           </div>
           
-          <h2 className="font-headline text-3xl md:text-4xl text-on-surface tracking-tight">
+          <h2 className="font-headline text-2xl sm:text-4xl text-on-surface tracking-tight">
             Book your <span className="italic text-primary">Master</span> Repair
           </h2>
-          <p className="text-on-surface-variant text-sm mt-3 max-w-sm mx-auto">
-            Fill in the details below and we&apos;ll match you with the best available expert in your neighborhood.
+          <p className="text-on-surface-variant text-xs sm:text-sm mt-3 max-w-sm mx-auto opacity-80">
+            Professional dispatch to your neighborhood.
           </p>
         </div>
 
         {/* Scrollable Form Area */}
-        <div className="px-8 pb-10 pt-4 max-h-[70vh] overflow-y-auto custom-scrollbar">
+        <div className="px-6 sm:px-8 pb-10 pt-4 max-h-[75vh] lg:max-h-[70vh] overflow-y-auto custom-scrollbar">
           <BookingForm 
             initialService={selectedService} 
             onSuccess={closeBooking} 

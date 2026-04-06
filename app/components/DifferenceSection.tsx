@@ -67,7 +67,7 @@ export default function DifferenceSection() {
             {POINTS.map(({ icon, title, body, color, iconColor }, i) => (
               <div
                 key={title}
-                className="group flex-shrink-0 w-[86%] md:w-full snap-center bg-surface-container-lowest p-8 md:p-10 rounded-[2rem] md:rounded-3xl border border-outline shadow-sm hover:shadow-xl hover:shadow-black/[0.04] transition-all duration-300 hover:-translate-y-1 cursor-default"
+                className="group flex-shrink-0 w-[86%] md:w-full snap-center bg-surface-container-lowest p-8 md:p-10 rounded-[2rem] md:rounded-3xl border border-outline shadow-sm hover:shadow-xl hover:shadow-black/[0.04] transition-all duration-300 hover:-translate-y-1 cursor-default active:scale-[0.98]"
                 style={{ animationDelay: `${i * 120}ms` }}
               >
                 {/* Icon */}

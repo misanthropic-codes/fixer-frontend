@@ -76,7 +76,7 @@ export default function Hero() {
             }`}
           >
             <span className="w-2 h-2 rounded-full bg-primary mr-2 animate-pulse" />
-            Local Expert Service
+            25 Years of Technical Mastery
           </span>
 
           {/* Headline */}
@@ -86,11 +86,11 @@ export default function Hero() {
             }`}
           >
             Your{" "}
-            <span className="italic text-primary">Fixxer</span>
+            <span className="italic text-primary">Fixer</span>
             <br />
-            for Expert
+            for Master
             <br className="hidden lg:block" />
-            {" "}Repair.
+            {" "}Repairs.
           </h1>
 
           {/* Subhead */}
@@ -99,11 +99,9 @@ export default function Hero() {
               mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
-            Certified technicians at your door in{" "}
-            <span className="font-bold text-on-surface">30 minutes</span>. We
-            carry guaranteed{" "}
-            <span className="font-bold text-on-surface">OEM parts</span> for
-            all major luxury brands.
+            India&apos;s trusted platform for appliance repair. Certified technicians at your door in{" "}
+            <span className="font-bold text-on-surface">30 minutes</span>. Transparent pricing with a{" "}
+            <span className="font-bold text-on-surface">60-day warranty</span>.
           </p>
 
           {/* CTAs */}
@@ -117,19 +115,19 @@ export default function Hero() {
               className="group relative bg-primary text-on-primary px-8 h-14 rounded-xl font-extrabold text-base overflow-hidden shadow-xl shadow-primary/20 flex items-center justify-center gap-2 transition-all duration-200 hover:scale-[0.97] hover:shadow-2xl hover:shadow-primary/30 active:scale-95"
             >
               <span className="material-symbols-outlined icon-filled text-xl">build</span>
-              <span>Book Repair Service</span>
+              <span>Book Master Service</span>
               <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
             </button>
             <Link 
               href="/services"
               className="bg-white text-on-surface border-2 border-outline px-8 h-14 rounded-xl font-bold text-base flex items-center justify-center gap-2 transition-all duration-200 hover:bg-surface-container hover:border-primary/20 hover:scale-[0.97] active:scale-95"
             >
-              <span className="material-symbols-outlined text-xl">storefront</span>
-              <span>Browse Services</span>
+              <span className="material-symbols-outlined text-xl">grid_view</span>
+              <span>View Categories</span>
             </Link>
           </div>
 
-          {/* Stats - Hidden or reduced on small mobile if needed, but keeping for now */}
+          {/* Stats */}
           <div
             className={`pt-6 lg:pt-8 border-t border-outline flex gap-8 lg:gap-10 transition-all duration-600 delay-500 ${
               mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"

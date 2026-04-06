@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useBooking } from "@/app/context/BookingContext";
+import { SERVICES } from "@/app/lib/services";
 
 const NAV_LINKS = [
   { label: "Home", href: "/" },
@@ -14,16 +16,38 @@ const NAV_LINKS = [
 /* ── Bottom nav items (mobile only) ── */
 const BOTTOM_NAV = [
   { label: "Home",     icon: "home",               href: "/" },
-  { label: "Services", icon: "home_repair_service", href: "#services" },
+  { label: "Services", icon: "home_repair_service", href: "/services" },
   // center slot — Book — rendered separately
-  { label: "Catalog",  icon: "storefront",          href: "#catalog" },
+  { label: "Catalog",  icon: "storefront",          href: "/services" },
   { label: "Support",  icon: "support_agent",       href: "#support" },
 ] as const;
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
-  const [activeTab, setActiveTab] = useState("Home");
-  const { openBooking } = useBooking();
+  const pathname = usePathname();
+  const router = useRouter();
+  const { openBooking, isOpen: isBookingOpen } = useBooking();
+
+  // Helper to determine if we are on a subpage for app-like header
+  const isSubpage = pathname !== "/";
+  
+  // Get page title for header
+  const getPageTitle = () => {
+    if (pathname === "/services") return "Services";
+    if (pathname.startsWith("/services/")) {
+      const slug = pathname.split("/").pop();
+      const service = SERVICES.find(s => s.slug === slug);
+      return service ? service.name : "Detail";
+    }
+    return "";
+  };
+
+  const activeTab = (() => {
+    if (isBookingOpen) return "Book";
+    if (pathname === "/") return "Home";
+    if (pathname.startsWith("/services")) return "Services";
+    return "";
+  })();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -96,24 +120,46 @@ export default function Navbar() {
           scrolled ? "glass shadow-sm border-b border-outline-variant" : "bg-white/95 backdrop-blur-sm shadow-sm"
         }`}
       >
-        <div className="flex items-center justify-between px-5 py-3">
-          {/* Brand */}
-          <Link href="/" className="text-xl font-black tracking-tighter text-zinc-900 select-none">
-            Fixx<span className="text-primary">er</span>
-          </Link>
+        <div className="flex items-center justify-between px-5 h-14">
+          {/* Brand or Back Button */}
+          {isSubpage ? (
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={() => router.back()}
+                className="w-10 h-10 -ml-2 flex items-center justify-center rounded-full active:bg-surface-container transition-colors"
+              >
+                <span className="material-symbols-outlined text-on-surface">arrow_back</span>
+              </button>
+              <h1 className="font-headline text-xl font-bold text-on-surface tracking-tight">
+                {getPageTitle()}
+              </h1>
+            </div>
+          ) : (
+            <Link href="/" className="text-xl font-black tracking-tighter text-zinc-900 select-none">
+              Fixx<span className="text-primary">er</span>
+            </Link>
+          )}
 
           {/* Right actions */}
           <div className="flex items-center gap-1">
+            {/* Search - Icon only for mobile if subpage */}
+            {isSubpage && (
+               <button className="w-10 h-10 flex items-center justify-center rounded-full active:bg-surface-container transition-colors">
+                 <span className="material-symbols-outlined text-zinc-600 text-[22px]">search</span>
+               </button>
+            )}
+            
             {/* Notification */}
-            <button className="relative w-9 h-9 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors">
-              <span className="material-symbols-outlined text-zinc-600 text-[20px]">notifications</span>
-              {/* Unread dot */}
-              <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-primary rounded-full border-2 border-white" />
-            </button>
+            {!isSubpage && (
+              <button className="relative w-10 h-10 flex items-center justify-center rounded-full active:bg-surface-container transition-colors">
+                <span className="material-symbols-outlined text-zinc-600 text-[22px]">notifications</span>
+                <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-primary rounded-full border-2 border-white" />
+              </button>
+            )}
 
             {/* Profile */}
-            <button className="w-9 h-9 flex items-center justify-center rounded-full bg-primary-container hover:bg-primary transition-all duration-200 group">
-              <span className="material-symbols-outlined icon-filled text-primary group-hover:text-white text-[20px] transition-colors">
+            <button className="w-10 h-10 flex items-center justify-center rounded-full bg-primary-container active:bg-primary transition-all duration-200 group">
+              <span className="material-symbols-outlined icon-filled text-primary group-active:text-white text-[22px] transition-colors">
                 account_circle
               </span>
             </button>
@@ -136,17 +182,14 @@ export default function Navbar() {
                 icon={icon}
                 href={href}
                 active={activeTab === label}
-                onClick={() => setActiveTab(label)}
+                onClick={() => {}}
               />
             ))}
 
             {/* ── Center: BOOK button (Elevated) ── */}
             <div className="relative flex flex-col items-center -mt-8">
               <button
-                onClick={() => {
-                  setActiveTab("Book");
-                  openBooking();
-                }}
+                onClick={() => openBooking()}
                 className={`w-14 h-14 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/30
                   border-[3px] border-white transition-all duration-200 active:scale-95
                   ${activeTab === "Book" ? "shadow-primary/40 bg-zinc-900" : "hover:scale-105"}`}
@@ -172,7 +215,7 @@ export default function Navbar() {
                 icon={icon}
                 href={href}
                 active={activeTab === label}
-                onClick={() => setActiveTab(label)}
+                onClick={() => {}}
               />
             ))}
           </div>
