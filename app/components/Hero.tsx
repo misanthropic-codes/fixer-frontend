@@ -58,20 +58,20 @@ export default function Hero() {
   useEffect(() => { setMounted(true); }, []);
 
   return (
-    <section className="relative min-h-[88vh] flex items-center bg-white overflow-hidden pt-4 md:pt-20">
+    <section className="relative min-h-[75vh] md:min-h-[85vh] flex items-center bg-white overflow-hidden pt-4 md:pt-12">
       {/* Ambient blobs */}
       <div className="pointer-events-none">
         <div className="absolute top-0 left-0 w-[600px] h-[600px] bg-primary-container/25 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/4" />
         <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-secondary-container/20 rounded-full blur-[100px] translate-x-1/3 translate-y-1/4" />
       </div>
 
-      <div className="container mx-auto px-6 md:px-10 max-w-screen-2xl flex flex-col lg:flex-row items-center gap-10 lg:gap-20 py-8 lg:py-16">
+      <div className="container mx-auto px-6 md:px-10 max-w-screen-2xl flex flex-col lg:flex-row items-center gap-10 lg:gap-20 py-6 lg:py-12">
         
         {/* ── Content (Now First for Mobile) ── */}
         <div className="w-full lg:w-1/2 flex flex-col order-first lg:order-none">
           {/* Badge */}
           <span
-            className={`inline-flex self-start items-center px-4 py-1.5 rounded-full bg-primary-container text-primary font-bold text-[10px] uppercase tracking-[0.2em] mb-5 lg:mb-7 transition-all duration-500 delay-100 ${
+            className={`inline-flex self-start items-center px-4 py-1.5 rounded-full bg-primary-container text-primary font-bold text-[10px] uppercase tracking-[0.2em] mb-4 lg:mb-6 transition-all duration-500 delay-100 ${
               mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
@@ -95,7 +95,7 @@ export default function Hero() {
 
           {/* Subhead */}
           <p
-            className={`text-base md:text-xl text-on-surface-variant max-w-lg mb-8 lg:mb-10 leading-relaxed transition-all duration-600 delay-300 ${
+            className={`text-base md:text-xl text-on-surface-variant max-w-lg mb-6 lg:mb-8 leading-relaxed transition-all duration-600 delay-300 ${
               mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
@@ -104,7 +104,7 @@ export default function Hero() {
 
           {/* CTAs */}
           <div
-            className={`flex flex-col sm:flex-row gap-4 mb-10 lg:mb-12 transition-all duration-600 delay-400 ${
+            className={`flex flex-col sm:flex-row gap-4 mb-8 lg:mb-10 transition-all duration-600 delay-400 ${
               mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >

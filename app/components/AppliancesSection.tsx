@@ -9,18 +9,18 @@ export default function AppliancesSection() {
   const { openBooking } = useBooking();
 
   return (
-    <section id="catalog" className="pt-8 pb-10 md:py-32 bg-surface">
+    <section id="catalog" className="pt-8 pb-10 md:py-20 bg-surface">
       <div className="container mx-auto px-6 md:px-10 max-w-screen-2xl">
         {/* Header */}
-        <div className="text-center max-w-2xl mx-auto mb-10 md:mb-20">
-          <p className="font-label text-[10px] md:text-xs uppercase tracking-[0.28em] font-bold text-primary mb-4">
+        <div className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
+          <p className="font-label text-[10px] md:text-xs uppercase tracking-[0.28em] font-bold text-primary mb-3">
             Master Solutions
           </p>
           <h2 className="font-headline text-3xl md:text-6xl tracking-tight text-on-surface leading-tight">
             Professional Service for{" "}
             <span className="italic text-primary">Every</span> Appliance
           </h2>
-          <div className="h-0.5 w-12 md:w-16 bg-primary mx-auto mt-6 md:mt-8 rounded-full" />
+          <div className="h-0.5 w-12 md:w-16 bg-primary mx-auto mt-4 md:mt-6 rounded-full" />
         </div>
 
         {/* Grid: 2 columns on mobile, 4 on large */}
@@ -87,7 +87,7 @@ export default function AppliancesSection() {
         </div>
 
         {/* Bottom CTA */}
-        <div className="mt-12 md:mt-20 text-center">
+        <div className="mt-10 md:mt-16 text-center">
           <Link 
             href="/services"
             className="inline-flex items-center gap-3 bg-zinc-900 text-white px-8 md:px-12 h-14 md:h-16 rounded-2xl font-black text-xs md:text-sm uppercase tracking-widest shadow-xl shadow-black/10 hover:bg-primary hover:scale-[0.98] active:scale-95 transition-all"

@@ -16,12 +16,12 @@ export default function ServicesPage() {
       <Navbar />
       <main className="pt-20 pb-20 bg-surface">
         {/* Simple Catalog Header */}
-        <section className="px-6 pt-12 md:pt-32 pb-10 md:pb-20 text-center">
+        <section className="px-6 pt-10 md:pt-20 pb-8 md:pb-12 text-center">
           <div className="max-w-4xl mx-auto">
-            <h1 className="font-headline text-5xl md:text-8xl leading-tight tracking-tight text-on-surface mb-6">
+            <h1 className="font-headline text-5xl md:text-7xl leading-tight tracking-tight text-on-surface mb-4">
               Our <span className="italic text-primary">Master</span> Catalog
             </h1>
-            <p className="text-sm md:text-xl text-on-surface-variant font-medium opacity-70 tracking-widest uppercase">
+            <p className="text-[10px] md:text-xs text-on-surface-variant font-black opacity-70 tracking-[0.25em] uppercase">
               Professional Service for every household appliance
             </p>
           </div>
@@ -29,7 +29,7 @@ export default function ServicesPage() {
 
         {/* Detailed Grid */}
         <section className="container mx-auto px-4 sm:px-6 md:px-10 max-w-screen-2xl">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10 pb-24 md:pb-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 pb-16 md:pb-20">
             {SERVICES.map((s, i) => (
               <div 
                 key={s.id} 

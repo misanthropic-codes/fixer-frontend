@@ -6,7 +6,7 @@ const LEGAL_LINKS = ["Privacy Policy", "Terms of Service"];
 export default function Footer() {
   return (
     <footer className="bg-zinc-50 border-t border-zinc-200">
-      <div className="max-w-screen-2xl mx-auto px-6 md:px-10 pt-12 md:pt-16 pb-8 md:pb-10">
+      <div className="max-w-screen-2xl mx-auto px-6 md:px-10 pt-8 md:pt-12 pb-6 md:pb-8">
         
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12 pb-10 md:pb-12 border-b border-zinc-200/70">

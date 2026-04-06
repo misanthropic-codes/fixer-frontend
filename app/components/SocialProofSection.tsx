@@ -8,9 +8,9 @@ const SERVICE_VAN_IMG =
 
 export default function SocialProofSection() {
   return (
-    <section className="pt-8 pb-10 md:py-28 bg-surface-dim border-y border-outline-variant overflow-hidden">
+    <section className="pt-8 pb-10 md:py-20 bg-surface-dim border-y border-outline-variant overflow-hidden">
       <div className="container mx-auto px-4 md:px-10 max-w-screen-2xl">
-        <div className="bg-surface-container-lowest rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-16 xl:p-20 shadow-xl shadow-black/[0.03] relative overflow-hidden flex flex-col lg:flex-row items-center gap-12 md:gap-16">
+        <div className="bg-surface-container-lowest rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-12 xl:p-16 shadow-xl shadow-black/[0.03] relative overflow-hidden flex flex-col lg:flex-row items-center gap-10 md:gap-14">
           
           {/* ── Left: Testimonial ── */}
           <div className="lg:w-1/2 flex flex-col">
@@ -24,7 +24,7 @@ export default function SocialProofSection() {
               </span>
             </div>
 
-            <h2 className="font-headline text-3xl md:text-6xl text-on-surface mb-6 md:mb-10 tracking-tight leading-tight md:leading-tight">
+            <h2 className="font-headline text-3xl md:text-6xl text-on-surface mb-5 md:mb-8 tracking-tight leading-tight md:leading-tight">
               Trusted by your{" "}
               <span className="italic text-primary">neighbors</span>.
             </h2>
