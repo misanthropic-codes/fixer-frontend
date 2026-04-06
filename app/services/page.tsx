@@ -15,46 +15,16 @@ export default function ServicesPage() {
     <>
       <Navbar />
       <main className="pt-20 pb-20 bg-surface">
-        {/* Page Hero */}
-        <section className="relative px-6 py-10 md:py-24 text-center overflow-hidden">
-          <div className="absolute inset-0 z-0">
-             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-full bg-primary/5 blur-[120px] rounded-full" />
-          </div>
-          
-          <div className="relative z-10 max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full mb-6 border border-primary/20">
-              <span className="material-symbols-outlined text-sm icon-filled">verified_user</span>
-              <span className="font-label text-[10px] uppercase tracking-[0.2em] font-black">25 Years of Excellence</span>
-            </div>
-            <h1 className="font-headline text-4xl md:text-8xl leading-tight tracking-tight text-on-surface mb-6 md:mb-8">
-              Certified repairs for <br /><span className="italic text-primary">every</span> household appliance.
+        {/* Simple Catalog Header */}
+        <section className="px-6 pt-12 md:pt-32 pb-10 md:pb-20 text-center">
+          <div className="max-w-4xl mx-auto">
+            <h1 className="font-headline text-5xl md:text-8xl leading-tight tracking-tight text-on-surface mb-6">
+              Our <span className="italic text-primary">Master</span> Catalog
             </h1>
-            <p className="text-base md:text-xl text-on-surface-variant leading-relaxed max-w-2xl mx-auto opacity-90">
-              Transparent pricing, 60-day warranty, and background-checked technicians. Restoring your home&apos;s comfort within hours.
+            <p className="text-sm md:text-xl text-on-surface-variant font-medium opacity-70 tracking-widest uppercase">
+              Professional Service for every household appliance
             </p>
           </div>
-        </section>
-
-        {/* Appliance Insurance Banner */}
-        <section className="container mx-auto px-4 sm:px-6 mb-20">
-           <div className="relative bg-zinc-900 rounded-[2rem] md:rounded-[3rem] p-8 md:p-12 overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 border border-white/10 shadow-2xl">
-              <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-primary/20 blur-[100px] -translate-y-1/2 translate-x-1/4 rounded-full pointer-events-none" />
-              <div className="relative z-10 max-w-xl text-center md:text-left">
-                 <h2 className="text-2xl md:text-4xl font-headline text-white mb-4">Free Service Charge for a Year?</h2>
-                 <p className="text-zinc-400 text-sm md:text-base leading-relaxed">
-                    Introducing <span className="text-white font-bold">Fixer Appliance Insurance</span>. Get zero service charges for 12 months and up to <span className="text-primary font-black">50% OFF</span> on every spare part.
-                 </p>
-              </div>
-              <div className="relative z-10 flex flex-col items-center md:items-end gap-3 shrink-0">
-                 <button 
-                  onClick={() => openBooking()}
-                  className="bg-primary text-on-primary px-8 h-14 rounded-xl font-black uppercase tracking-widest hover:scale-[0.98] transition-all shadow-lg shadow-primary/20"
-                 >
-                    Get Protected
-                 </button>
-                 <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold">*Available on selected appliances</p>
-              </div>
-           </div>
         </section>
 
         {/* Detailed Grid */}

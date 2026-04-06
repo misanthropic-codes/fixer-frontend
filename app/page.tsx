@@ -3,6 +3,7 @@ import Hero from "@/app/components/Hero";
 import DifferenceSection from "@/app/components/DifferenceSection";
 import AppliancesSection from "@/app/components/AppliancesSection";
 import SocialProofSection from "@/app/components/SocialProofSection";
+import InsuranceBanner from "@/app/components/InsuranceBanner";
 import Footer from "@/app/components/Footer";
 
 export default function Home() {
@@ -13,6 +14,7 @@ export default function Home() {
       <main className="pb-24 md:pb-0">
         <Hero />
         <DifferenceSection />
+        <InsuranceBanner />
         <AppliancesSection />
         <SocialProofSection />
       </main>
