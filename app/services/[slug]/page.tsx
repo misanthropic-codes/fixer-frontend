@@ -24,7 +24,7 @@ export default function ServiceDetail({ params }: { params: Promise<{ slug: stri
       <Navbar />
       <main className="bg-white min-h-screen">
         {/* ── Hero Section ── */}
-        <section className="relative pt-20 pb-12 lg:pt-32 lg:pb-32 overflow-hidden">
+        <section className="relative pt-14 pb-12 lg:pt-32 lg:pb-32 overflow-hidden">
           {/* Ambient background decoration */}
           <div className="absolute top-0 right-0 w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-primary/5 rounded-full blur-[80px] md:blur-[100px] translate-x-1/4 -translate-y-1/4" />
           

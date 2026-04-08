@@ -5,21 +5,22 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useBooking } from "@/app/context/BookingContext";
 import { SERVICES } from "@/app/lib/services";
+import { getSparePartBySlug } from "@/app/lib/spareParts";
 
 const NAV_LINKS = [
   { label: "Home", href: "/" },
   { label: "Services", href: "/services" },
-  { label: "Catalog", href: "/services" },
-  { label: "Support", href: "#support" },
+  { label: "Spare Parts", href: "/spare-parts" },
+  { label: "My Bookings", href: "/my-bookings" },
 ] as const;
 
 /* ── Bottom nav items (mobile only) ── */
 const BOTTOM_NAV = [
-  { label: "Home",     icon: "home",               href: "/" },
+  { label: "Home", icon: "home", href: "/" },
   { label: "Services", icon: "home_repair_service", href: "/services" },
   // center slot — Book — rendered separately
-  { label: "Catalog",  icon: "storefront",          href: "/services" },
-  { label: "Support",  icon: "support_agent",       href: "#support" },
+  { label: "Spare Parts", icon: "storefront", href: "/spare-parts" },
+  { label: "My Bookings", icon: "event_note", href: "/my-bookings" },
 ] as const;
 
 export default function Navbar() {
@@ -30,15 +31,23 @@ export default function Navbar() {
 
   // Helper to determine if we are on a subpage for app-like header
   const isSubpage = pathname !== "/";
-  
+
   // Get page title for header
   const getPageTitle = () => {
     if (pathname === "/services") return "Services";
     if (pathname.startsWith("/services/")) {
       const slug = pathname.split("/").pop();
-      const service = SERVICES.find(s => s.slug === slug);
+      const service = SERVICES.find((s) => s.slug === slug);
       return service ? service.name : "Detail";
     }
+    if (pathname === "/spare-parts") return "Spare Parts";
+    if (pathname.startsWith("/spare-parts/")) {
+      const slug = pathname.split("/").pop();
+      if (slug === "enquiry") return "Part Enquiry";
+      const part = slug ? getSparePartBySlug(slug) : undefined;
+      return part ? part.name : "Part Detail";
+    }
+    if (pathname === "/my-bookings") return "My Bookings";
     return "";
   };
 
@@ -46,6 +55,8 @@ export default function Navbar() {
     if (isBookingOpen) return "Book";
     if (pathname === "/") return "Home";
     if (pathname.startsWith("/services")) return "Services";
+    if (pathname.startsWith("/spare-parts")) return "Spare Parts";
+    if (pathname === "/my-bookings") return "My Bookings";
     return "";
   })();
 
@@ -71,7 +82,10 @@ export default function Navbar() {
         <nav className="flex justify-between items-center px-6 md:px-10 py-4 max-w-screen-2xl mx-auto">
           {/* Logo + Links */}
           <div className="flex items-center gap-10">
-            <Link href="/" className="text-2xl font-black tracking-tighter text-zinc-900 select-none">
+            <Link
+              href="/"
+              className="text-2xl font-black tracking-tighter text-zinc-900 select-none"
+            >
               Fixx<span className="text-primary">er</span>
             </Link>
 
@@ -93,7 +107,9 @@ export default function Navbar() {
           {/* Actions */}
           <div className="flex items-center gap-3">
             <div className="hidden lg:flex items-center bg-surface-container rounded-full px-4 py-2.5 border border-outline gap-2 transition-all duration-200 focus-within:border-primary/30 focus-within:shadow-sm">
-              <span className="material-symbols-outlined text-on-surface-variant text-xl">search</span>
+              <span className="material-symbols-outlined text-on-surface-variant text-xl">
+                search
+              </span>
               <input
                 type="text"
                 placeholder="Search parts…"
@@ -101,7 +117,7 @@ export default function Navbar() {
               />
             </div>
 
-            <button 
+            <button
               onClick={() => openBooking()}
               className="group relative bg-primary text-on-primary px-6 h-11 rounded-xl font-bold text-sm overflow-hidden uppercase tracking-wide shadow-lg shadow-primary/15 transition-all duration-200 hover:shadow-xl hover:shadow-primary/25 hover:scale-[0.97] active:scale-95"
             >
@@ -117,25 +133,32 @@ export default function Navbar() {
       ════════════════════════════════════════ */}
       <header
         className={`md:hidden fixed top-0 w-full z-50 transition-all duration-300 ${
-          scrolled ? "glass shadow-sm border-b border-outline-variant" : "bg-white/95 backdrop-blur-sm shadow-sm"
+          scrolled
+            ? "glass shadow-sm border-b border-outline-variant"
+            : "bg-white/95 backdrop-blur-sm shadow-sm"
         }`}
       >
         <div className="flex items-center justify-between px-5 h-14">
           {/* Brand or Back Button */}
           {isSubpage ? (
             <div className="flex items-center gap-4">
-              <button 
+              <button
                 onClick={() => router.back()}
                 className="w-10 h-10 -ml-2 flex items-center justify-center rounded-full active:bg-surface-container transition-colors"
               >
-                <span className="material-symbols-outlined text-on-surface">arrow_back</span>
+                <span className="material-symbols-outlined text-on-surface">
+                  arrow_back
+                </span>
               </button>
               <h1 className="font-headline text-xl font-bold text-on-surface tracking-tight">
                 {getPageTitle()}
               </h1>
             </div>
           ) : (
-            <Link href="/" className="text-xl font-black tracking-tighter text-zinc-900 select-none">
+            <Link
+              href="/"
+              className="text-xl font-black tracking-tighter text-zinc-900 select-none"
+            >
               Fixx<span className="text-primary">er</span>
             </Link>
           )}
@@ -144,15 +167,19 @@ export default function Navbar() {
           <div className="flex items-center gap-1">
             {/* Search - Icon only for mobile if subpage */}
             {isSubpage && (
-               <button className="w-10 h-10 flex items-center justify-center rounded-full active:bg-surface-container transition-colors">
-                 <span className="material-symbols-outlined text-zinc-600 text-[22px]">search</span>
-               </button>
+              <button className="w-10 h-10 flex items-center justify-center rounded-full active:bg-surface-container transition-colors">
+                <span className="material-symbols-outlined text-zinc-600 text-[22px]">
+                  search
+                </span>
+              </button>
             )}
-            
+
             {/* Notification */}
             {!isSubpage && (
               <button className="relative w-10 h-10 flex items-center justify-center rounded-full active:bg-surface-container transition-colors">
-                <span className="material-symbols-outlined text-zinc-600 text-[22px]">notifications</span>
+                <span className="material-symbols-outlined text-zinc-600 text-[22px]">
+                  notifications
+                </span>
                 <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-primary rounded-full border-2 border-white" />
               </button>
             )}
@@ -173,7 +200,6 @@ export default function Navbar() {
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50">
         <div className="bg-white/98 backdrop-blur-xl border-t border-outline-variant/50 px-1 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
           <div className="flex items-center justify-around h-14 relative">
-
             {/* Left two items */}
             {BOTTOM_NAV.slice(0, 2).map(({ label, icon, href }) => (
               <BottomTab
@@ -243,7 +269,7 @@ function BottomTab({
     <Link
       href={href}
       onClick={onClick}
-      className={`flex flex-col items-center justify-center gap-0.5 px-2 min-w-[64px] h-full transition-all duration-200 ${
+      className={`flex flex-col items-center justify-center gap-0.5 px-2 min-w-16 h-full transition-all duration-200 ${
         active ? "text-primary" : "text-zinc-500"
       }`}
     >

@@ -25,7 +25,7 @@ export const SERVICES: Service[] = [
     title: "Expert Refrigerator Repair",
     startingPrice: "₹249",
     icon: "ac_unit",
-    image: "https://images.unsplash.com/photo-1571175432230-01c24844c021?q=80&w=2000&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1550989460-0adf9ea622e2?q=80&w=2000&auto=format&fit=crop",
     description: "Professional grade technical mastery for your kitchen's heart. Fixed base service charges depending on appliance type and category.",
     features: ["60 Days Service Warranty", "Up to 30 Days Part Warranty", "Transparent Pricing", "Genuine Spare Parts"],
     subCategories: [
@@ -41,7 +41,7 @@ export const SERVICES: Service[] = [
     title: "Premium Washing Machine Service",
     startingPrice: "₹249",
     icon: "local_laundry_service",
-    image: "https://images.unsplash.com/photo-1582735689369-4fe89db7114c?q=80&w=2000&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1610557892470-55d9e80c0bce?q=80&w=2000&auto=format&fit=crop",
     description: "Don't let laundry pile up. We provide fast, reliable repairs with transparent pricing and standardized service experience.",
     features: ["60 Days Service Warranty", "Up to 30 Days Part Warranty", "Transparent Pricing", "Vibration & Noise Diagnosis"],
     subCategories: [
@@ -57,7 +57,7 @@ export const SERVICES: Service[] = [
     title: "Professional Microwave Repair",
     startingPrice: "₹249",
     icon: "cooking",
-    image: "https://images.unsplash.com/photo-1585659722982-7896088a341e?q=80&w=2000&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1556910103-1c02745aae4d?q=80&w=2000&auto=format&fit=crop",
     description: "Keep your kitchen running perfectly. Service pricing is based on appliance volume and capacity. Our technicians are factory-trained for all models.",
     features: ["60 Days Service Warranty", "Up to 30 Days Part Warranty", "Transparent Pricing", "Safety Radiation Checks"],
     subCategories: [

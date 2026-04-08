@@ -71,7 +71,7 @@ export default function Hero() {
         <div className="w-full lg:w-1/2 flex flex-col order-first lg:order-none">
           {/* Badge */}
           <span
-            className={`inline-flex self-start items-center px-4 py-1.5 rounded-full bg-primary-container text-primary font-bold text-[10px] uppercase tracking-[0.2em] mb-4 lg:mb-6 transition-all duration-500 delay-100 ${
+            className={`inline-flex self-start items-center px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-primary-container text-primary font-bold text-[9px] md:text-[10px] uppercase tracking-[0.1em] md:tracking-[0.2em] whitespace-nowrap mb-4 lg:mb-6 transition-all duration-500 delay-100 ${
               mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
@@ -81,7 +81,7 @@ export default function Hero() {
 
           {/* Headline */}
           <h1
-            className={`font-headline text-[3rem] md:text-[4.5rem] lg:text-[5.5rem] text-on-surface leading-[0.95] lg:leading-[0.92] tracking-tighter mb-5 lg:mb-7 transition-all duration-600 delay-200 ${
+            className={`font-headline text-4xl sm:text-5xl md:text-[4.5rem] lg:text-[5.5rem] text-on-surface leading-[1.05] lg:leading-[0.92] tracking-tight md:tracking-tighter mb-5 lg:mb-7 transition-all duration-600 delay-200 ${
               mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             }`}
           >
@@ -127,7 +127,7 @@ export default function Hero() {
 
           {/* Stats */}
           <div
-            className={`pt-6 lg:pt-8 border-t border-outline flex gap-8 lg:gap-10 transition-all duration-600 delay-500 ${
+            className={`pt-5 lg:pt-8 border-t border-outline flex justify-between sm:justify-start sm:gap-12 lg:gap-16 transition-all duration-600 delay-500 ${
               mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
