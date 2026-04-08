@@ -55,7 +55,9 @@ const STATS = [
 export default function Hero() {
   const [mounted, setMounted] = useState(false);
   const { openBooking } = useBooking();
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <section className="relative min-h-[75vh] md:min-h-[85vh] flex items-center bg-white overflow-hidden pt-4 md:pt-12">
@@ -66,7 +68,6 @@ export default function Hero() {
       </div>
 
       <div className="container mx-auto px-6 md:px-10 max-w-screen-2xl flex flex-col lg:flex-row items-center gap-10 lg:gap-20 py-6 lg:py-12">
-        
         {/* ── Content (Now First for Mobile) ── */}
         <div className="w-full lg:w-1/2 flex flex-col order-first lg:order-none">
           {/* Badge */}
@@ -85,12 +86,10 @@ export default function Hero() {
               mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             }`}
           >
-            Your{" "}
-            <span className="italic text-primary">Fixer</span>
+            Your <span className="italic text-primary">Fixxer</span>
             <br />
             for Master
-            <br className="hidden lg:block" />
-            {" "}Repairs.
+            <br className="hidden lg:block" /> Repairs.
           </h1>
 
           {/* Subhead */}
@@ -99,7 +98,13 @@ export default function Hero() {
               mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
-            India&apos;s trusted platform for appliance repair. <span className="font-bold text-on-surface">60-day warranty</span> & <span className="font-bold text-on-surface">Appliance Insurance</span> included. Free service charge for a year & up to 50% off on every spare part.
+            India&apos;s trusted platform for appliance repair.{" "}
+            <span className="font-bold text-on-surface">60-day warranty</span> &{" "}
+            <span className="font-bold text-on-surface">
+              Appliance Insurance
+            </span>{" "}
+            included. Free service charge for a year & up to 50% off on every
+            spare part.
           </p>
 
           {/* CTAs */}
@@ -108,19 +113,23 @@ export default function Hero() {
               mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
-            <button 
+            <button
               onClick={() => openBooking()}
               className="group relative bg-primary text-on-primary px-8 h-14 rounded-xl font-extrabold text-base overflow-hidden shadow-xl shadow-primary/20 flex items-center justify-center gap-2 transition-all duration-200 hover:scale-[0.97] hover:shadow-2xl hover:shadow-primary/30 active:scale-95"
             >
-              <span className="material-symbols-outlined icon-filled text-xl">build</span>
+              <span className="material-symbols-outlined icon-filled text-xl">
+                build
+              </span>
               <span>Book Master Service</span>
               <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
             </button>
-            <Link 
+            <Link
               href="/services"
               className="bg-white text-on-surface border-2 border-outline px-8 h-14 rounded-xl font-bold text-base flex items-center justify-center gap-2 transition-all duration-200 hover:bg-surface-container hover:border-primary/20 hover:scale-[0.97] active:scale-95"
             >
-              <span className="material-symbols-outlined text-xl">grid_view</span>
+              <span className="material-symbols-outlined text-xl">
+                grid_view
+              </span>
               <span>View Categories</span>
             </Link>
           </div>
@@ -174,10 +183,14 @@ export default function Hero() {
             <div className="absolute bottom-4 left-4 right-4 lg:bottom-8 lg:left-8 lg:right-8">
               <div className="bg-white/92 backdrop-blur-md p-3 lg:p-5 rounded-xl lg:rounded-2xl border border-white/30 shadow-xl flex items-center gap-3 lg:gap-4 transition-all duration-300">
                 <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-primary flex items-center justify-center text-white flex-shrink-0">
-                  <span className="material-symbols-outlined icon-filled text-lg lg:text-xl">verified</span>
+                  <span className="material-symbols-outlined icon-filled text-lg lg:text-xl">
+                    verified
+                  </span>
                 </div>
                 <div>
-                  <p className="font-bold text-sm lg:text-base text-zinc-900 leading-tight">Master Technician</p>
+                  <p className="font-bold text-sm lg:text-base text-zinc-900 leading-tight">
+                    Master Technician
+                  </p>
                   <p className="text-[9px] lg:text-xs text-zinc-500 uppercase tracking-widest font-bold mt-0.5">
                     Background Checked
                   </p>
@@ -186,7 +199,6 @@ export default function Hero() {
             </div>
           </div>
         </div>
-
       </div>
     </section>
   );
