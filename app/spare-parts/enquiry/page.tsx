@@ -1,15 +1,30 @@
-"use client";
-
-import { useSearchParams } from "next/navigation";
 import Navbar from "@/app/components/Navbar";
 import Footer from "@/app/components/Footer";
 import SparePartsEnquiryForm from "@/app/components/SparePartsEnquiryForm";
-import { getSparePartById } from "@/app/lib/spareParts";
 
-export default function SparePartsEnquiryPage() {
-  const searchParams = useSearchParams();
-  const selectedPartId = searchParams.get("part") ?? "";
-  const selectedPart = getSparePartById(selectedPartId);
+export default async function SparePartsEnquiryPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ part?: string }>;
+}) {
+  const params = await searchParams;
+  const selectedPartId = params.part ?? "";
+
+  // Fetch all spare parts from the backend API
+  let spareParts = [];
+  try {
+    const res = await fetch("http://localhost:3000/api/v1/spare-parts", {
+      cache: "no-store",
+    });
+    if (res.ok) {
+      spareParts = await res.json();
+    }
+  } catch (error) {
+    console.error("Failed to fetch spare parts:", error);
+  }
+
+  // Find if there's a pre-selected part
+  const selectedPart = spareParts.find((p: any) => p._id === selectedPartId);
 
   return (
     <>
@@ -32,6 +47,7 @@ export default function SparePartsEnquiryPage() {
             <div className="mt-8">
               <SparePartsEnquiryForm
                 initialPartId={selectedPartId || undefined}
+                availableParts={spareParts}
               />
             </div>
           </div>

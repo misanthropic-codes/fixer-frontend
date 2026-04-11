@@ -3,7 +3,6 @@
 import React, { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useBooking } from "@/app/context/BookingContext";
-import { SPARE_PARTS, getSparePartById } from "@/app/lib/spareParts";
 
 interface EnquiryPartItem {
   partId: string;
@@ -12,10 +11,12 @@ interface EnquiryPartItem {
 
 interface SparePartsEnquiryFormProps {
   initialPartId?: string;
+  availableParts: any[];
 }
 
 export default function SparePartsEnquiryForm({
   initialPartId,
+  availableParts = [],
 }: SparePartsEnquiryFormProps) {
   const router = useRouter();
   const { createPartInquiry } = useBooking();
@@ -66,20 +67,26 @@ export default function SparePartsEnquiryForm({
 
     setIsSubmitting(true);
 
-    createPartInquiry({
-      customerName,
-      phone,
-      email,
-      address,
-      preferredDate,
-      preferredTime,
-      notes,
-      items: normalizedItems,
-    });
+    try {
+      // Send real POST request if needed (optional integration)
+      // For now, using context to maintain global UI behavior as previously designed:
+      createPartInquiry({
+        customerName,
+        phone,
+        email,
+        address,
+        preferredDate,
+        preferredTime,
+        notes,
+        items: normalizedItems,
+      });
 
-    await new Promise((resolve) => setTimeout(resolve, 700));
-
-    router.push("/my-bookings");
+      await new Promise((resolve) => setTimeout(resolve, 700));
+      router.push("/my-bookings");
+    } catch (e) {
+      console.error(e);
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -113,8 +120,8 @@ export default function SparePartsEnquiryForm({
               className="w-full h-12 bg-surface-container-low border-2 border-outline rounded-xl px-4 appearance-none outline-none focus:border-primary transition-all duration-200 text-on-surface font-medium"
             >
               <option value="">Select a spare part...</option>
-              {SPARE_PARTS.map((part) => (
-                <option key={part.id} value={part.id}>
+              {availableParts.map((part) => (
+                <option key={part._id} value={part._id}>
                   {part.name} - {part.price}
                 </option>
               ))}
@@ -268,7 +275,7 @@ export default function SparePartsEnquiryForm({
             {items
               .filter((item) => item.partId)
               .map((item, index) => {
-                const matched = getSparePartById(item.partId);
+                const matched = availableParts.find((p) => p._id === item.partId);
                 return (
                   <li
                     key={`${item.partId}-${index}`}
