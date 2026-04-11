@@ -17,14 +17,15 @@ export default async function SparePartsEnquiryPage({
       cache: "no-store",
     });
     if (res.ok) {
-      spareParts = await res.json();
+      const json = await res.json();
+      spareParts = Array.isArray(json) ? json : (json.data || []);
     }
   } catch (error) {
     console.error("Failed to fetch spare parts:", error);
   }
 
   // Find if there's a pre-selected part
-  const selectedPart = spareParts.find((p: any) => p._id === selectedPartId);
+  const selectedPart = Array.isArray(spareParts) ? spareParts.find((p: any) => p._id === selectedPartId) : null;
 
   return (
     <>

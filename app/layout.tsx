@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Newsreader } from "next/font/google";
 import { BookingProvider } from "@/app/context/BookingContext";
+import { AuthProvider } from "@/app/context/AuthContext";
 import BookingModal from "@/app/components/BookingModal";
 import "./globals.css";
 
@@ -42,10 +43,12 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
-        <BookingProvider>
-          {children}
-          <BookingModal />
-        </BookingProvider>
+        <AuthProvider>
+          <BookingProvider>
+            {children}
+            <BookingModal />
+          </BookingProvider>
+        </AuthProvider>
       </body>
     </html>
   );

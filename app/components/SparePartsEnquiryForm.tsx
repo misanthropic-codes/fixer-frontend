@@ -3,6 +3,7 @@
 import React, { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useBooking } from "@/app/context/BookingContext";
+import { useAuth } from "@/app/context/AuthContext";
 
 interface EnquiryPartItem {
   partId: string;
@@ -20,18 +21,31 @@ export default function SparePartsEnquiryForm({
 }: SparePartsEnquiryFormProps) {
   const router = useRouter();
   const { createPartInquiry } = useBooking();
+  const { user, token } = useAuth();
 
   const [items, setItems] = useState<EnquiryPartItem[]>([
     { partId: initialPartId ?? "", quantity: 1 },
   ]);
-  const [customerName, setCustomerName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
+  
+  // Auto-populate form if user is logged in
+  const [customerName, setCustomerName] = useState(user?.fullName || "");
+  const [phone, setPhone] = useState(user?.phone || "");
+  const [email, setEmail] = useState(user?.email || "");
   const [address, setAddress] = useState("");
   const [preferredDate, setPreferredDate] = useState("");
   const [preferredTime, setPreferredTime] = useState("");
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
+
+  // Sync state if user loads after component mount
+  React.useEffect(() => {
+    if (user) {
+      if (!customerName) setCustomerName(user.fullName || "");
+      if (!phone) setPhone(user.phone || "");
+      if (!email) setEmail(user.email || "");
+    }
+  }, [user]);
 
   const selectedCount = useMemo(
     () => items.filter((item) => item.partId).length,
@@ -55,6 +69,12 @@ export default function SparePartsEnquiryForm({
 
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    setError("");
+
+    if (!user || !token) {
+      router.push(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+      return;
+    }
 
     const normalizedItems = items
       .filter((item) => item.partId)
@@ -68,29 +88,44 @@ export default function SparePartsEnquiryForm({
     setIsSubmitting(true);
 
     try {
-      // Send real POST request if needed (optional integration)
-      // For now, using context to maintain global UI behavior as previously designed:
-      createPartInquiry({
-        customerName,
-        phone,
-        email,
-        address,
-        preferredDate,
-        preferredTime,
-        notes,
-        items: normalizedItems,
+      const res = await fetch("http://localhost:3000/api/v1/part-orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          contactData: {
+            name: customerName,
+            phone,
+            email,
+            address,
+          },
+          items: normalizedItems,
+        }),
       });
 
-      await new Promise((resolve) => setTimeout(resolve, 700));
-      router.push("/my-bookings");
-    } catch (e) {
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || "Failed to submit order");
+      }
+
+      router.push("/my-bookings?success=true");
+    } catch (e: any) {
       console.error(e);
+      setError(e.message || "Something went wrong. Please try again.");
       setIsSubmitting(false);
     }
   };
 
   return (
     <form onSubmit={onSubmit} className="space-y-6">
+      {error && (
+        <div className="p-4 rounded-2xl bg-error/10 border border-error/20 flex items-center gap-3 text-error text-sm font-bold">
+          <span className="material-symbols-outlined text-lg">error</span>
+          {error}
+        </div>
+      )}
       <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">
           Selected spare parts

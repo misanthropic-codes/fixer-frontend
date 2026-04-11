@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useBooking } from "@/app/context/BookingContext";
+import { useAuth } from "@/app/context/AuthContext";
 import { SERVICES } from "@/app/lib/services";
 import { getSparePartBySlug } from "@/app/lib/spareParts";
 
@@ -28,6 +29,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { openBooking, isOpen: isBookingOpen } = useBooking();
+  const { user, logout } = useAuth();
 
   // Helper to determine if we are on a subpage for app-like header
   const isSubpage = pathname !== "/";
@@ -116,6 +118,34 @@ export default function Navbar() {
                 className="bg-transparent border-none outline-none text-sm w-44 text-on-surface placeholder:text-on-surface-variant"
               />
             </div>
+            
+            {user ? (
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={() => router.push('/my-bookings')}
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-surface-container transition-colors"
+                >
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+                    {user.fullName?.charAt(0) || 'U'}
+                  </div>
+                  <span className="text-sm font-bold text-zinc-900 hidden lg:block">{user.fullName}</span>
+                </button>
+                <button 
+                  onClick={() => logout()}
+                  className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-error/10 text-error/70 hover:text-error transition-all"
+                  title="Logout"
+                >
+                  <span className="material-symbols-outlined text-xl">logout</span>
+                </button>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className="h-11 px-6 flex items-center justify-center rounded-xl border-2 border-outline hover:border-zinc-900 transition-all font-bold text-sm tracking-wide"
+              >
+                Login
+              </Link>
+            )}
 
             <button
               onClick={() => openBooking()}
@@ -185,10 +215,17 @@ export default function Navbar() {
             )}
 
             {/* Profile */}
-            <button className="w-10 h-10 flex items-center justify-center rounded-full bg-primary-container active:bg-primary transition-all duration-200 group">
-              <span className="material-symbols-outlined icon-filled text-primary group-active:text-white text-[22px] transition-colors">
-                account_circle
-              </span>
+            <button 
+              onClick={() => router.push(user ? '/my-bookings' : '/login')}
+              className={`w-10 h-10 flex items-center justify-center rounded-full transition-all duration-200 group ${user ? 'bg-primary text-white' : 'bg-primary-container text-primary'}`}
+            >
+              {user ? (
+                <span className="text-[10px] font-black">{user.fullName?.charAt(0)}</span>
+              ) : (
+                <span className="material-symbols-outlined icon-filled transition-colors text-[22px]">
+                  account_circle
+                </span>
+              )}
             </button>
           </div>
         </div>
