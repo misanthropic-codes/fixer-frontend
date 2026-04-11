@@ -1,47 +1,115 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { SERVICES } from "@/app/lib/services";
+import { useAuth } from "@/app/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 interface BookingFormProps {
-  initialService?: string;
+  initialServiceSlug?: string;
   onSuccess?: () => void;
   className?: string;
 }
 
-export default function BookingForm({ initialService, onSuccess, className = "" }: BookingFormProps) {
+export default function BookingForm({ initialServiceSlug, onSuccess, className = "" }: BookingFormProps) {
+  const { user, token } = useAuth();
+  const router = useRouter();
+
+  const [services, setServices] = useState<any[]>([]);
   const [formData, setFormData] = useState({
-    serviceId: "",
-    subCategoryId: "",
-    name: "",
-    phone: "",
+    serviceId: "", // This will be the _id from backend
+    subCategoryId: "", // This will be the _id from backend
+    name: user?.fullName || "",
+    phone: user?.phone || "",
     zip: "",
+    address: "",
     description: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [error, setError] = useState("");
 
+  // Fetch services on mount
   useEffect(() => {
-    if (initialService) {
-      setFormData((prev) => ({ ...prev, serviceId: initialService, subCategoryId: "" }));
-    }
-  }, [initialService]);
+    const fetchServices = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/api/v1/services");
+        if (res.ok) {
+          const data = await res.json();
+          setServices(data);
+          
+          // Handle initial service slug if provided
+          if (initialServiceSlug) {
+            const matched = data.find((s: any) => s.slug === initialServiceSlug);
+            if (matched) {
+              setFormData(prev => ({ ...prev, serviceId: matched._id }));
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load services:", err);
+      }
+    };
+    fetchServices();
+  }, [initialServiceSlug]);
 
-  const selectedServiceData = SERVICES.find(s => s.id === formData.serviceId);
-  const selectedSubCategory = selectedServiceData?.subCategories?.find(sc => sc.id === formData.subCategoryId);
+  // Sync user info if it loads later
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        name: prev.name || user.fullName || "",
+        phone: prev.phone || user.phone || ""
+      }));
+    }
+  }, [user]);
+
+  const selectedServiceData = services.find(s => s._id === formData.serviceId);
+  const selectedSubCategory = selectedServiceData?.subCategories?.find((sc: any) => sc._id === formData.subCategoryId);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+
+    if (!user || !token) {
+      router.push(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
+      return;
+    }
+
     setIsSubmitting(true);
     
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    
-    setIsSubmitting(false);
-    setIsSuccess(true);
-    if (onSuccess) {
-      setTimeout(onSuccess, 2000);
+    try {
+      const res = await fetch("http://localhost:3000/api/v1/bookings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          serviceId: formData.serviceId,
+          subCategoryId: formData.subCategoryId,
+          contactPhone: formData.phone,
+          addressData: {
+            zip: formData.zip,
+            text: formData.address
+          },
+          description: formData.description
+        })
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || "Failed to book service");
+      }
+
+      setIsSuccess(true);
+      if (onSuccess) {
+        setTimeout(onSuccess, 2000);
+      }
+    } catch (err: any) {
+      setError(err.message || "Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -59,12 +127,25 @@ export default function BookingForm({ initialService, onSuccess, className = "" 
            <p className="text-[10px] uppercase tracking-widest font-black text-primary mb-1">Service Warranty</p>
            <p className="text-xs font-medium text-on-surface">60 Days Protection Enabled</p>
         </div>
+        <button 
+          onClick={() => router.push('/my-bookings')}
+          className="mt-8 text-xs font-black uppercase tracking-widest text-primary hover:underline"
+        >
+          View My Bookings
+        </button>
       </div>
     );
   }
 
   return (
     <form onSubmit={handleSubmit} className={`space-y-6 ${className}`}>
+      {error && (
+        <div className="p-4 rounded-2xl bg-error/10 border border-error/20 flex items-center gap-3 text-error text-sm font-bold">
+          <span className="material-symbols-outlined text-lg">error</span>
+          {error}
+        </div>
+      )}
+
       {/* Service & Subcategory Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {/* Category */}
@@ -81,8 +162,8 @@ export default function BookingForm({ initialService, onSuccess, className = "" 
               className="w-full h-13 bg-surface-container-low border-2 border-outline rounded-xl px-4 appearance-none outline-none focus:border-primary transition-all duration-200 text-on-surface font-medium"
             >
               <option value="" disabled>Select category...</option>
-              {SERVICES.map((s) => (
-                <option key={s.id} value={s.id}>{s.name}</option>
+              {services.map((s) => (
+                <option key={s._id} value={s._id}>{s.name}</option>
               ))}
             </select>
             <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">
@@ -105,8 +186,8 @@ export default function BookingForm({ initialService, onSuccess, className = "" 
               className="w-full h-13 bg-surface-container-low border-2 border-outline rounded-xl px-4 appearance-none outline-none focus:border-primary transition-all duration-200 text-on-surface font-medium"
             >
               <option value="" disabled>Select type...</option>
-              {selectedServiceData?.subCategories?.map((sc) => (
-                <option key={sc.id} value={sc.id}>{sc.name}</option>
+              {selectedServiceData?.subCategories?.map((sc: any) => (
+                <option key={sc._id} value={sc._id}>{sc.name}</option>
               ))}
             </select>
             <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">
@@ -131,14 +212,6 @@ export default function BookingForm({ initialService, onSuccess, className = "" 
                  </span>
                  <p className="text-[10px] text-on-surface-variant mt-1">Visit fee included</p>
               </div>
-           </div>
-           <div className="pt-3 border-t border-primary/10">
-              <p className="text-[10px] font-medium text-on-surface-variant flex items-start gap-2">
-                 <span className="material-symbols-outlined text-sm text-primary">info</span>
-                 <span>
-                    <span className="font-bold text-on-surface">Dynamic Parts Cost:</span> Additional cost for parts (if required) will be displayed transparently before service completion. Approve pricing before we start.
-                 </span>
-              </p>
            </div>
         </div>
       )}
@@ -175,6 +248,51 @@ export default function BookingForm({ initialService, onSuccess, className = "" 
         </div>
       </div>
 
+      <div className="grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-5">
+        <div className="space-y-2">
+          <label htmlFor="zip" className="block font-label text-[10px] uppercase tracking-widest font-black text-on-surface-variant">
+            Pincode
+          </label>
+          <input
+            id="zip"
+            type="text"
+            required
+            placeholder="000000"
+            value={formData.zip}
+            onChange={(e) => setFormData({ ...formData, zip: e.target.value })}
+            className="w-full h-13 bg-surface-container-low border-2 border-outline rounded-xl px-4 outline-none focus:border-primary"
+          />
+        </div>
+        <div className="space-y-2">
+          <label htmlFor="address" className="block font-label text-[10px] uppercase tracking-widest font-black text-on-surface-variant">
+            Complete Address
+          </label>
+          <input
+            id="address"
+            type="text"
+            required
+            placeholder="House no, Building, Area"
+            value={formData.address}
+            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+            className="w-full h-13 bg-surface-container-low border-2 border-outline rounded-xl px-4 outline-none focus:border-primary"
+          />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <label htmlFor="description" className="block font-label text-[10px] uppercase tracking-widest font-black text-on-surface-variant">
+          Problem Description
+        </label>
+        <textarea
+          id="description"
+          rows={3}
+          placeholder="What's happening with your appliance?"
+          value={formData.description}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          className="w-full bg-surface-container-low border-2 border-outline rounded-xl px-4 py-3 outline-none focus:border-primary transition-all duration-200 text-on-surface"
+        />
+      </div>
+
       <button
         type="submit"
         disabled={isSubmitting}
@@ -189,18 +307,6 @@ export default function BookingForm({ initialService, onSuccess, className = "" 
           </>
         )}
       </button>
-      
-      <div className="bg-surface-container-highest/30 rounded-xl p-4 border border-outline-variant space-y-3">
-        <p className="text-[10px] font-medium text-on-surface-variant leading-relaxed">
-          <span className="font-bold text-on-surface block mb-1 uppercase tracking-wider text-[9px]">Warranty Terms</span>
-          • 60 Days Service Warranty on all repairs.<br/>
-          • Up to 30 Days Warranty on selected genuine spare parts.<br/>
-          • Transparent pricing: Approve part costs before service completion.
-        </p>
-        <p className="text-[9px] text-on-surface-variant/70 italic">
-          * A diagnostic fee applies if repair is not performed after inspection.
-        </p>
-      </div>
     </form>
   );
 }

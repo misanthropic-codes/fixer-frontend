@@ -1,19 +1,26 @@
-"use client";
-
-import React, { use } from "react";
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/app/components/Navbar";
 import Footer from "@/app/components/Footer";
 import BookingForm from "@/app/components/BookingForm";
-import { getServiceBySlug } from "@/app/lib/services";
-import { useBooking } from "@/app/context/BookingContext";
+import BookRepairButton from "./BookRepairButton";
 import { notFound } from "next/navigation";
 
-export default function ServiceDetail({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = use(params);
-  const service = getServiceBySlug(slug);
-  const { openBooking } = useBooking();
+export default async function ServiceDetail({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  
+  let service = null;
+  try {
+    const res = await fetch(`http://localhost:3000/api/v1/services/${slug}`, {
+      cache: "no-store",
+    });
+    if (res.ok) {
+      service = await res.json();
+    }
+  } catch (error) {
+    console.error("Failed to fetch service detail:", error);
+  }
 
   if (!service) {
     notFound();
@@ -41,7 +48,7 @@ export default function ServiceDetail({ params }: { params: Promise<{ slug: stri
               </div>
               
               <h1 className="font-headline text-4xl md:text-7xl lg:text-8xl tracking-tighter leading-[0.95] text-on-surface mb-6 md:mb-8">
-                {service.title.split(' ').map((word, i) => (
+                {service.title.split(' ').map((word: string, i: number) => (
                   <span key={i} className={i === service.title.split(' ').length - 1 ? 'italic text-primary' : ''}>
                     {word}{' '}
                   </span>
@@ -53,13 +60,7 @@ export default function ServiceDetail({ params }: { params: Promise<{ slug: stri
               </p>
 
               <div className="flex flex-wrap gap-3 md:gap-4">
-                <button 
-                  onClick={() => openBooking(service.id)}
-                  className="bg-primary text-on-primary px-8 md:px-10 h-13 md:h-14 rounded-xl font-extra-bold uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-[0.98] transition-all transform active:scale-95 flex items-center justify-center gap-2 text-xs md:text-base"
-                >
-                   <span className="material-symbols-outlined icon-filled text-lg">calendar_month</span>
-                   Instant Booking
-                </button>
+                <BookRepairButton serviceSlug={service.slug} />
                 <div className="flex items-center gap-3 px-5 md:px-6 bg-surface-container rounded-xl border border-outline h-13 md:h-14">
                    <span className="font-label text-[9px] md:text-xs uppercase tracking-widest opacity-60">Starting at</span>
                    <span className="font-headline text-xl md:text-2xl text-on-surface font-bold">{service.startingPrice}</span>
@@ -100,7 +101,7 @@ export default function ServiceDetail({ params }: { params: Promise<{ slug: stri
         <section className="py-16 md:py-32 bg-surface-container-lowest">
            <div className="container mx-auto px-6 md:px-10 max-w-screen-2xl">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10">
-                 {service.features.map((feature, i) => (
+                 {service.features.map((feature: string) => (
                     <div key={feature} className="space-y-3 md:space-y-4 group">
                        <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/5 rounded-xl md:rounded-2xl flex items-center justify-center group-hover:bg-primary transition-colors duration-300">
                           <span className="material-symbols-outlined text-primary group-hover:text-white transition-colors duration-300 icon-filled text-xl">stars</span>
@@ -146,7 +147,7 @@ export default function ServiceDetail({ params }: { params: Promise<{ slug: stri
                  <div className="lg:w-1/2 w-full">
                     <div className="bg-surface-container-low p-6 md:p-10 rounded-3xl md:rounded-[3rem] border border-outline shadow-2xl">
                        <h3 className="font-headline text-xl md:text-2xl text-on-surface mb-6 md:mb-8 text-center">Fast Track Dispatch</h3>
-                       <BookingForm initialService={service.id} />
+                       <BookingForm initialServiceSlug={service.slug} />
                     </div>
                  </div>
               </div>
