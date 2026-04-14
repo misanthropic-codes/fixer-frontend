@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Navbar from "@/app/components/Navbar";
 import Footer from "@/app/components/Footer";
@@ -9,6 +9,14 @@ import { useAuth } from "@/app/context/AuthContext";
 type TabType = "repairs" | "parts";
 
 export default function MyBookingsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-surface" />}>
+      <MyBookingsContent />
+    </Suspense>
+  );
+}
+
+function MyBookingsContent() {
   const { user, token, loading: authLoading } = useAuth();
   const searchParams = useSearchParams();
   const showSuccess = searchParams.get("success") === "true";

@@ -82,7 +82,7 @@ export default function BookingModal() {
         {/* Scrollable Form Area */}
         <div className="px-6 sm:px-8 pb-10 pt-4 max-h-[75vh] lg:max-h-[70vh] overflow-y-auto custom-scrollbar">
           <BookingForm 
-            initialService={selectedService} 
+            initialServiceSlug={selectedService} 
             onSuccess={closeBooking} 
           />
         </div>
