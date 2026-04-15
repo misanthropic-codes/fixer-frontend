@@ -29,6 +29,17 @@ export default function BookingDetailPage() {
     recommendations: "",
     warrantyPeriod: "60 Days"
   });
+  const [productDetails, setProductDetails] = useState({
+    brand: "",
+    modelNumber: "",
+    serialNumber: ""
+  });
+  const [additionalCharges, setAdditionalCharges] = useState<any[]>([]);
+  const [serviceFee, setServiceFee] = useState<number>(0);
+  const [serviceProperties, setServiceProperties] = useState({
+    serviceType: "REPAIR",
+    paymentStatus: "UNPAID"
+  });
 
   useEffect(() => {
     if (token && id) {
@@ -55,6 +66,15 @@ export default function BookingDetailPage() {
           warrantyPeriod: data.jobDetails.warrantyPeriod || "60 Days"
         });
       }
+      if (data.productDetails) setProductDetails(data.productDetails);
+      if (data.invoiceData) {
+        setServiceFee(data.invoiceData.serviceTotal || 0);
+        setAdditionalCharges(data.invoiceData.additionalCharges || []);
+      }
+      setServiceProperties({
+        serviceType: data.serviceType || "REPAIR",
+        paymentStatus: data.paymentStatus || "UNPAID"
+      });
     } catch (err) {
       console.error(err);
     } finally {
@@ -142,6 +162,56 @@ export default function BookingDetailPage() {
     }
   };
 
+  const handleUpdateProductDetails = async () => {
+    setUpdating(true);
+    try {
+      await fetch(`${API}/admin/bookings/${id}/product-details`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify(productDetails),
+      });
+      fetchBookingInfo();
+      alert("Product details saved.");
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleUpdateServiceProperties = async (props: any) => {
+    setUpdating(true);
+    try {
+      await fetch(`${API}/admin/bookings/${id}/service-properties`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify(props),
+      });
+      fetchBookingInfo();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleSaveInvoiceManual = async () => {
+    setUpdating(true);
+    try {
+      await fetch(`${API}/admin/bookings/${id}/invoice-manual`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ serviceTotal: serviceFee, additionalCharges }),
+      });
+      fetchBookingInfo();
+      alert("Invoice updated successfully.");
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setUpdating(false);
+    }
+  };
+
   if (loading) return <div style={{ padding: 40 }}>Loading booking details...</div>;
   if (!booking) return <div style={{ padding: 40 }}>Booking not found.</div>;
 
@@ -174,17 +244,61 @@ export default function BookingDetailPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 24 }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-          {/* Main Details */}
-          <div className="admin-card">
-            <h3 style={{ fontSize: 14, textTransform: "uppercase", letterSpacing: 1, color: "var(--admin-text-muted)", marginBottom: 16 }}>
-              Service Information
-            </h3>
-            <div style={{ display: "flex", flexDirection: "column", gap: 12, fontSize: 13 }}>
-              <div><strong style={{ color: "var(--admin-text-dim)" }}>Service:</strong> {booking.serviceId?.name} ({booking.serviceId?.title || ''})</div>
-              <div><strong style={{ color: "var(--admin-text-dim)" }}>Description:</strong> {booking.description || "N/A"}</div>
-              <div><strong style={{ color: "var(--admin-text-dim)" }}>Preferred Date:</strong> {new Date(booking.preferredDate).toLocaleDateString()} at {booking.preferredTime}</div>
+            {/* Product & Service Info */}
+            <div className="admin-card">
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                <h3 style={{ fontSize: 14, textTransform: "uppercase", letterSpacing: 1, color: "var(--admin-text-muted)" }}>
+                  Product & Service Details
+                </h3>
+                <button 
+                  className="admin-btn admin-btn-ghost admin-btn-sm" 
+                  onClick={handleUpdateProductDetails}
+                  disabled={updating || booking.isBilled}
+                >
+                  Save Info
+                </button>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                <div>
+                  <label className="admin-label">Brand</label>
+                  <input 
+                    className="admin-input" 
+                    placeholder="e.g. Samsung" 
+                    value={productDetails.brand}
+                    onChange={e => setProductDetails({...productDetails, brand: e.target.value})}
+                    disabled={booking.isBilled}
+                  />
+                </div>
+                <div>
+                  <label className="admin-label">Model Number</label>
+                  <input 
+                    className="admin-input" 
+                    placeholder="e.g. RF28" 
+                    value={productDetails.modelNumber}
+                    onChange={e => setProductDetails({...productDetails, modelNumber: e.target.value})}
+                    disabled={booking.isBilled}
+                  />
+                </div>
+                <div>
+                  <label className="admin-label">Serial Number</label>
+                  <input 
+                    className="admin-input" 
+                    placeholder="e.g. SN-998811" 
+                    value={productDetails.serialNumber}
+                    onChange={e => setProductDetails({...productDetails, serialNumber: e.target.value})}
+                    disabled={booking.isBilled}
+                  />
+                </div>
+                <div>
+                  <label className="admin-label">Service Category</label>
+                  <div style={{ fontSize: 13, height: 40, display: 'flex', alignItems: 'center', opacity: 0.7 }}>
+                    {booking.serviceId?.name}
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
+
+            {/* Job Sheet Editor */}
 
           {/* Customer Details */}
           <div className="admin-card">
@@ -351,6 +465,44 @@ export default function BookingDetailPage() {
             </h3>
             
             <div style={{ marginBottom: 16 }}>
+              <label className="admin-label">Service Type</label>
+              <select 
+                className="admin-input admin-select" 
+                value={serviceProperties.serviceType} 
+                onChange={e => {
+                  const val = e.target.value;
+                  setServiceProperties({...serviceProperties, serviceType: val});
+                  handleUpdateServiceProperties({...serviceProperties, serviceType: val});
+                }}
+                disabled={updating || booking.isBilled}
+              >
+                <option value="REPAIR">REPAIR</option>
+                <option value="INSTALLATION">INSTALLATION</option>
+                <option value="MAINTENANCE">MAINTENANCE</option>
+                <option value="WARRANTY_CHECK">WARRANTY_CHECK</option>
+              </select>
+            </div>
+
+            <div style={{ marginBottom: 16 }}>
+              <label className="admin-label">Payment Status</label>
+              <select 
+                className="admin-input admin-select" 
+                value={serviceProperties.paymentStatus} 
+                onChange={e => {
+                  const val = e.target.value;
+                  setServiceProperties({...serviceProperties, paymentStatus: val});
+                  handleUpdateServiceProperties({...serviceProperties, paymentStatus: val});
+                }}
+                disabled={updating || booking.isBilled}
+              >
+                <option value="UNPAID">PENDING</option>
+                <option value="PAID_CASH">PAID (CASH)</option>
+                <option value="PAID_ONLINE">PAID (ONLINE)</option>
+                <option value="WARRANTY_SERVICE">WARRANTY SERVICE</option>
+              </select>
+            </div>
+
+            <div style={{ marginBottom: 16 }}>
               <label className="admin-label">Status</label>
               <select 
                 className="admin-input admin-select" 
@@ -397,28 +549,94 @@ export default function BookingDetailPage() {
             )}
           </div>
 
-          {/* Invoice Summary */}
-          {booking.invoiceData && (
-            <div className="admin-card">
-              <h3 style={{ fontSize: 14, textTransform: "uppercase", letterSpacing: 1, color: "var(--admin-text-muted)", marginBottom: 16 }}>
-                Invoice Summary
+          {/* Interactive Bill Editor */}
+          <div className="admin-card">
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+              <h3 style={{ fontSize: 14, textTransform: "uppercase", letterSpacing: 1, color: "var(--admin-text-muted)" }}>
+                Billing Breakdown
               </h3>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: 13 }}>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span>Service Fee:</span>
-                  <span>₹{booking.invoiceData.serviceTotal}</span>
+              {!booking.isBilled && (
+                <button 
+                  className="admin-btn admin-btn-secondary admin-btn-sm" 
+                  onClick={handleSaveInvoiceManual}
+                  disabled={updating}
+                >
+                  Save Bill
+                </button>
+              )}
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 100px", gap: 12, alignItems: 'center' }}>
+                <span style={{ fontSize: 13, color: 'var(--admin-text-dim)' }}>Base Service Charge</span>
+                <input 
+                  type="number"
+                  className="admin-input"
+                  style={{ height: 32, padding: '4px 8px', textAlign: 'right' }}
+                  value={serviceFee}
+                  onChange={e => setServiceFee(Number(e.target.value))}
+                  disabled={booking.isBilled}
+                />
+              </div>
+
+              {additionalCharges.map((charge, idx) => (
+                <div key={idx} style={{ display: "grid", gridTemplateColumns: "1fr 100px 32px", gap: 12, alignItems: 'center' }}>
+                  <input 
+                    className="admin-input"
+                    style={{ height: 32, padding: '4px 8px' }}
+                    value={charge.label}
+                    onChange={e => {
+                      const newCharges = [...additionalCharges];
+                      newCharges[idx].label = e.target.value;
+                      setAdditionalCharges(newCharges);
+                    }}
+                    disabled={booking.isBilled}
+                  />
+                  <input 
+                    type="number"
+                    className="admin-input"
+                    style={{ height: 32, padding: '4px 8px', textAlign: 'right' }}
+                    value={charge.amount}
+                    onChange={e => {
+                      const newCharges = [...additionalCharges];
+                      newCharges[idx].amount = Number(e.target.value);
+                      setAdditionalCharges(newCharges);
+                    }}
+                    disabled={booking.isBilled}
+                  />
+                  {!booking.isBilled && (
+                    <button 
+                      className="admin-btn admin-btn-ghost admin-btn-sm"
+                      style={{ padding: 0 }}
+                      onClick={() => setAdditionalCharges(additionalCharges.filter((_, i) => i !== idx))}
+                    >
+                      <span className="material-symbols-outlined text-sm">delete</span>
+                    </button>
+                  )}
                 </div>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span>Parts Total:</span>
-                  <span>₹{booking.invoiceData.partsTotal}</span>
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 700, borderTop: "1px solid var(--admin-border)", paddingTop: 8, marginTop: 4 }}>
-                  <span>Grand Total:</span>
-                  <span>₹{booking.invoiceData.totalAmount}</span>
-                </div>
+              ))}
+
+              {!booking.isBilled && (
+                <button 
+                   className="admin-btn admin-btn-ghost admin-btn-sm"
+                   style={{ fontSize: 11, alignSelf: 'flex-start' }}
+                   onClick={() => setAdditionalCharges([...additionalCharges, { label: "New Charge", amount: 0 }])}
+                >
+                  + Add Other Charge
+                </button>
+              )}
+
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, marginTop: 8 }}>
+                <span>Spare Parts Total:</span>
+                <span style={{ fontWeight: 600 }}>₹{booking.invoiceData?.partsTotal || 0}</span>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 800, borderTop: "1px solid var(--admin-border)", paddingTop: 12, marginTop: 4, fontSize: 15 }}>
+                <span>Grand Total:</span>
+                <span style={{ color: 'var(--admin-primary)' }}>₹{booking.invoiceData?.totalAmount || 0}</span>
               </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
 

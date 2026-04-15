@@ -21,6 +21,11 @@ export function openJobSheet(booking: any) {
   const pincode = booking.addressData?.zip || "—";
   const description = booking.description || "";
 
+  const brand = booking.productDetails?.brand || "—";
+  const modelNo = booking.productDetails?.modelNumber || "—";
+  const serialNo = booking.productDetails?.serialNumber || "—";
+  const serviceType = booking.serviceType || "REPAIR";
+
   const techName = booking.technicianId?.name || "—";
   const visits = booking.visits || [];
   const v1 = visits.find((v: any) => v.visitOrder === 1) || {};
@@ -157,9 +162,9 @@ export function openJobSheet(booking: any) {
             <tr><td class="lbl">Preferred Time:</td><td></td></tr>
             <tr><td class="lbl">Product Category:</td><td style="font-weight:bold;">${serviceName.toUpperCase()}</td></tr>
             <tr><td class="lbl">Product Sub Category:</td><td>${serviceTitle}</td></tr>
-            <tr><td class="lbl">Product Code:</td><td></td></tr>
-            <tr><td class="lbl">Cabinet Serial Number:</td><td></td></tr>
-            <tr><td class="lbl">Trade Partner - Serial No:</td><td></td></tr>
+            <tr><td class="lbl">Brand:</td><td style="font-weight:bold;">${brand}</td></tr>
+            <tr><td class="lbl">Model Number:</td><td>${modelNo}</td></tr>
+            <tr><td class="lbl">Serial Number:</td><td>${serialNo}</td></tr>
             <tr><td class="lbl">Date of Purchase:</td><td></td></tr>
           </table>
         </td>
@@ -384,7 +389,7 @@ export function openPartBill(order: any) {
     </tr>
   `).join("") || "<tr><td colspan='3' style='text-align:center; padding:20px;'>No items found</td></tr>";
 
-  const html = \`<!DOCTYPE html>
+  const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -410,15 +415,15 @@ export function openPartBill(order: any) {
     <div class="logo">Fixxer<b>.</b></div>
     <div class="invoice-info">
       <h1 style="margin:0; font-size:24px;">TAX INVOICE</h1>
-      <p style="margin:5px 0 0 0;">Order #\${orderNo}</p>
-      <p style="margin:2px 0 0 0;">Date: \${createdDate}</p>
+      <p style="margin:5px 0 0 0;">Order #${orderNo}</p>
+      <p style="margin:2px 0 0 0;">Date: ${createdDate}</p>
     </div>
   </div>
   <div class="section">
     <div class="section-title">Shipping Address</div>
-    <p style="margin:0; font-weight:bold;">\${customerName}</p>
-    <p style="margin:2px 0 0 0;">\${address}</p>
-    <p style="margin:2px 0 0 0;">Phone: \${customerPhone}</p>
+    <p style="margin:0; font-weight:bold;">${customerName}</p>
+    <p style="margin:2px 0 0 0;">${address}</p>
+    <p style="margin:2px 0 0 0;">Phone: ${customerPhone}</p>
   </div>
   <div class="section">
     <div class="section-title">Order Items</div>
@@ -431,7 +436,7 @@ export function openPartBill(order: any) {
         </tr>
       </thead>
       <tbody>
-        \${itemsHtml}
+        ${itemsHtml}
       </tbody>
     </table>
   </div>
@@ -440,7 +445,7 @@ export function openPartBill(order: any) {
     <p>www.fixer.in | support@fixer.in</p>
   </div>
 </body>
-</html>\`;
+</html>`;
 
   const printWindow = window.open("", "_blank", "width=800,height=800");
   if (printWindow) {
@@ -448,4 +453,156 @@ export function openPartBill(order: any) {
     printWindow.document.close();
   }
 }
+
+export function openRetailInvoice(booking: any) {
+  const invoiceNo = booking._id?.slice(-8).toUpperCase() || "N/A";
+  const date = booking.invoiceData?.generatedAt 
+    ? new Date(booking.invoiceData.generatedAt).toLocaleDateString("en-IN") 
+    : new Date().toLocaleDateString("en-IN");
+  
+  const customerName = booking.userId?.fullName || "—";
+  const address = booking.addressData?.text || "—";
+  const phone = booking.contactPhone || booking.userId?.phone || "—";
+  
+  const additionalCharges = booking.invoiceData?.additionalCharges || [];
+  const visits = booking.visits || [];
+  const allParts = visits.flatMap((v: any) => v.partsUsed || []);
+
+  const itemsHtml = [
+    // Service Fee
+    `<tr>
+      <td style="padding:12px; border:1px solid #eee;">
+        <strong>${booking.serviceId?.name || 'Service'} Fee</strong><br>
+        <span style="font-size:11px; color:#666;">${booking.serviceType || 'Repair'} Service for ${booking.productDetails?.brand || ''} ${booking.productDetails?.modelNumber || ''}</span>
+      </td>
+      <td style="padding:12px; border:1px solid #eee; text-align:right;">₹${booking.invoiceData?.serviceTotal || 0}</td>
+    </tr>`,
+    // Parts
+    ...allParts.map((p: any) => `
+      <tr>
+        <td style="padding:12px; border:1px solid #eee;">
+          <strong>${p.isThirdParty ? p.partName : (p.sparePartId?.name || 'Spare Part')}</strong><br>
+          <span style="font-size:11px; color:#666;">Part Replacement (${p.quantity} qty)</span>
+        </td>
+        <td style="padding:12px; border:1px solid #eee; text-align:right;">₹${(p.cost || parseFloat(String(p.sparePartId?.price || 0).replace(/[₹,\s]/g, ''))) * p.quantity}</td>
+      </tr>
+    `),
+    // Additional Charges
+    ...additionalCharges.map((c: any) => `
+      <tr>
+        <td style="padding:12px; border:1px solid #eee;">
+          <strong>${c.label}</strong>
+        </td>
+        <td style="padding:12px; border:1px solid #eee; text-align:right;">₹${c.amount}</td>
+      </tr>
+    `)
+  ].join("");
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: 'Inter', system-ui, sans-serif; padding: 40px; color: #1a1a1a; line-height: 1.5; font-size: 13px; }
+  .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 4px solid #f4f4f5; padding-bottom: 30px; }
+  .logo { font-size: 32px; font-weight: 800; letter-spacing: -1px; }
+  .logo b { color: #e0133a; }
+  .invoice-label { text-align: right; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+  .section-title { font-weight: 800; text-transform: uppercase; font-size: 11px; color: #71717a; letter-spacing: 1px; margin-bottom: 12px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+  th { text-align: left; background: #f4f4f5; padding: 12px; font-weight: 700; border: 1px solid #e4e4e7; }
+  .totals { margin-left: auto; width: 300px; border-top: 2px solid #1a1a1a; padding-top: 15px; }
+  .total-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; }
+  .grand-total { font-size: 20px; font-weight: 800; color: #e0133a; margin-top: 10px; border-top: 1px solid #e4e4e7; padding-top: 10px; }
+  .footer { margin-top: 60px; padding-top: 30px; border-top: 1px solid #e4e4e7; font-size: 11px; color: #71717a; text-align: center; }
+  .badge { display: inline-block; padding: 4px 12px; border-radius: 6px; background: #f4f4f5; font-weight: 700; font-size: 10px; text-transform: uppercase; }
+  @media print { .no-print { display: none; } @page { margin: 0; } body { padding: 20mm; } }
+</style>
+</head>
+<body>
+  <div class="no-print" style="position: fixed; top: 20px; right: 20px; z-index: 100;">
+    <button onclick="window.print()" style="padding: 12px 24px; background: #1a1a1a; color: #fff; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);">Print / Save PDF</button>
+  </div>
+
+  <div class="header">
+    <div>
+      <div class="logo">Fixxer<b>.</b></div>
+      <p style="margin-top: 8px; color: #71717a;">Reliable Repairs, Master Technicians.</p>
+    </div>
+    <div class="invoice-label">
+      <h1 style="margin: 0; font-size: 32px; font-weight: 800; letter-spacing: -1px;">Retail Invoice</h1>
+      <p style="margin: 4px 0 0 0; font-weight: 700; font-size: 16px;">#${invoiceNo}</p>
+      <p style="margin: 2px 0 0 0; font-weight: 500; color: #71717a;">Date: ${date}</p>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div>
+      <div class="section-title">Service Details</div>
+      <p style="font-weight: 700; font-size: 15px; margin-bottom: 4px;">${booking.serviceId?.name} - ${booking.serviceType || 'Repair'}</p>
+      <p style="color: #71717a;">Brand: <strong>${booking.productDetails?.brand || 'N/A'}</strong></p>
+      <p style="color: #71717a;">Model: <strong>${booking.productDetails?.modelNumber || 'N/A'}</strong></p>
+      <p style="color: #71717a;">Serial: <strong>${booking.productDetails?.serialNumber || 'N/A'}</strong></p>
+    </div>
+    <div>
+      <div class="section-title">Billed To</div>
+      <p style="font-weight: 700; font-size: 15px; margin-bottom: 4px;">${customerName}</p>
+      <p style="color: #71717a; max-width: 250px;">${address}</p>
+      <p style="margin-top: 8px; font-weight: 600;">Phone: ${phone}</p>
+    </div>
+  </div>
+
+  <div class="section-title">Bill Items</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Description of Service / Part</th>
+        <th style="text-align:right;">Amount (INR)</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${itemsHtml}
+    </tbody>
+  </table>
+
+  <div class="totals">
+    <div class="total-row">
+      <span>Subtotal</span>
+      <span>₹${booking.invoiceData?.totalAmount || 0}</span>
+    </div>
+    <div class="total-row" style="color: #71717a;">
+      <span>Taxes (Included)</span>
+      <span>₹0.00</span>
+    </div>
+    <div class="total-row grand-total">
+      <span>Grand Total</span>
+      <span>₹${booking.invoiceData?.totalAmount || 0}</span>
+    </div>
+  </div>
+
+  <div style="margin-top: 40px; padding: 20px; background: #f9fafb; border-radius: 12px; border: 1px solid #f3f4f6;">
+    <div class="section-title">Warranty & Sign-off</div>
+    <p style="margin-bottom: 12px;"><strong>Warranty Coverage:</strong> ${booking.jobDetails?.warrantyPeriod || '60 Days'} from the date of completion on the specified work done.</p>
+    <div style="display: flex; gap: 40px; margin-top: 20px;">
+      <div style="flex: 1; border-top: 1px solid #e4e4e7; padding-top: 10px; font-size: 10px;">AUTHORIZED SIGNATORY (Fixxer)</div>
+      <div style="flex: 1; border-top: 1px solid #e4e4e7; padding-top: 10px; font-size: 10px;">CUSTOMER ACKNOWLEDGEMENT</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>&copy; 2026 Fixxer Service Platform. All rights reserved.</p>
+    <p>This is a computer generated invoice and does not require a physical signature.</p>
+    <p>Visit us at <strong>www.fixer.in</strong> | Support: <strong>support@fixer.in</strong></p>
+  </div>
+</body>
+</html>`;
+
+  const printWindow = window.open("", "_blank", "width=900,height=850");
+  if (printWindow) {
+    printWindow.document.write(html);
+    printWindow.document.close();
+  }
+}
+
 

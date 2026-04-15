@@ -6,7 +6,7 @@ import Navbar from "@/app/components/Navbar";
 import Footer from "@/app/components/Footer";
 import { useAuth } from "@/app/context/AuthContext";
 import { API_URL } from "@/app/config";
-import { openJobSheet, openPartBill } from "@/app/admin/utils/jobsheet";
+import { openJobSheet, openPartBill, openRetailInvoice } from "@/app/admin/utils/jobsheet";
 
 type TabType = "repairs" | "parts";
 
@@ -202,7 +202,7 @@ function MyBookingsContent() {
 
                             {booking.isBilled && (
                               <button 
-                                onClick={() => openJobSheet(booking)}
+                                onClick={() => openRetailInvoice(booking)}
                                 className="mt-4 w-full h-11 rounded-xl bg-zinc-900 text-white text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-black transition-colors"
                               >
                                 <span className="material-symbols-outlined text-lg">download</span>
