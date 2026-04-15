@@ -21,6 +21,28 @@ export function openJobSheet(booking: any) {
   const pincode = booking.addressData?.zip || "—";
   const description = booking.description || "";
 
+  const techName = booking.technicianId?.name || "—";
+  const visits = booking.visits || [];
+  const v1 = visits.find((v: any) => v.visitOrder === 1) || {};
+  const v2 = visits.find((v: any) => v.visitOrder === 2) || {};
+  
+  const allParts = visits.flatMap((v: any) => v.partsUsed || []);
+  const partsHtml = allParts.map((p: any) => `
+    <tr>
+      <td class="lbl">${p.isThirdParty ? 'EXT' : p.sparePartId?.partNumber || ''}</td>
+      <td>${p.isThirdParty ? p.partName : p.sparePartId?.name || ''}</td>
+      <td>${p.isThirdParty ? p.vendor : p.sparePartId?.manufacturer || ''}</td>
+      <td style="text-align:center;">${p.quantity || 1}</td>
+      <td style="text-align:right;">${p.cost || p.sparePartId?.price || 0}</td>
+      <td style="text-align:right;">${((p.cost || parseFloat(String(p.sparePartId?.price || 0).replace(/[₹,\s]/g, ''))) * (p.quantity || 1)).toFixed(2)}</td>
+    </tr>
+  `).join("") || `
+    <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr>
+  `;
+  const invoiceAmount = booking.invoiceData?.totalAmount ? `INR ${booking.invoiceData.totalAmount}` : "____________";
+
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -188,31 +210,41 @@ export function openJobSheet(booking: any) {
       </tr>
     </table>
 
+    <!-- Job Details (Primary Findings) -->
+    <table style="border-top:none;">
+      <tr>
+        <td style="width:50%;">
+          <div class="lbl" style="margin-bottom:4px; font-weight:bold;">DIAGNOSIS / PROBLEM FOUND:</div>
+          <div style="font-size:10px; min-height:30px;">${booking.jobDetails?.diagnosis || '—'}</div>
+        </td>
+        <td style="width:50%;">
+          <div class="lbl" style="margin-bottom:4px; font-weight:bold;">WORK DONE / ACTION TAKEN:</div>
+          <div style="font-size:10px; min-height:30px;">${booking.jobDetails?.workDone || '—'}</div>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <div class="lbl" style="margin-bottom:4px; font-weight:bold;">RECOMMENDATIONS & NOTES:</div>
+          <div style="font-size:10px;">${booking.jobDetails?.recommendations || '—'}</div>
+        </td>
+      </tr>
+    </table>
+
     <!-- Visits -->
     <table style="border-top:none; text-align:left;">
       <tr style="background:#f9f9f9;">
         <td style="width:10%;" class="lbl">Visit No -1</td>
-        <td style="width:25%;" class="lbl">Technician Name</td>
-        <td style="width:15%;" class="lbl">Visit Date</td>
-        <td style="width:15%;" class="lbl">Time In</td>
-        <td style="width:35%;" class="lbl">Time Out</td>
-      </tr>
-      <tr>
-        <td class="lbl">Job Description</td>
-        <td colspan="3"></td>
-        <td class="lbl">Tech Remarks & Sign</td>
+        <td style="width:25%;" class="lbl">${techName}</td>
+        <td style="width:15%;" class="lbl">${v1.scheduledDate ? new Date(v1.scheduledDate).toLocaleDateString() : ""}</td>
+        <td style="width:15%;" class="lbl">${v1.timeIn ? new Date(v1.timeIn).toLocaleTimeString() : ""}</td>
+        <td style="width:35%;" class="lbl">${v1.timeOut ? new Date(v1.timeOut).toLocaleTimeString() : ""}</td>
       </tr>
       <tr style="background:#f9f9f9;">
         <td class="lbl">Visit No -2</td>
-        <td class="lbl">Technician Name</td>
-        <td class="lbl">Visit Date</td>
-        <td class="lbl">Time In</td>
-        <td class="lbl">Time Out</td>
-      </tr>
-      <tr>
-        <td class="lbl">Job Description</td>
-        <td colspan="3"></td>
-        <td class="lbl">Tech Remarks & Sign</td>
+        <td class="lbl">${techName}</td>
+        <td class="lbl">${v2.scheduledDate ? new Date(v2.scheduledDate).toLocaleDateString() : ""}</td>
+        <td class="lbl">${v2.timeIn ? new Date(v2.timeIn).toLocaleTimeString() : ""}</td>
+        <td class="lbl">${v2.timeOut ? new Date(v2.timeOut).toLocaleTimeString() : ""}</td>
       </tr>
     </table>
 
@@ -229,18 +261,16 @@ export function openJobSheet(booking: any) {
         </tr>
       </thead>
       <tbody>
-        <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr>
-        <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr>
-        <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr>
+        ${partsHtml}
       </tbody>
       <tfoot style="font-size:9px;">
         <tr>
           <td colspan="5" style="border-left:none; text-align:right;" class="lbl">Labour(Service) / Transportation charges (if any) :</td>
-          <td></td>
+          <td style="text-align:right;">${booking.invoiceData?.serviceTotal || 0}</td>
         </tr>
         <tr>
           <td colspan="5" style="border-left:none; text-align:right; font-weight:bold; font-size:10px;">Total :</td>
-          <td></td>
+          <td style="text-align:right;">${booking.invoiceData?.totalAmount || 0}</td>
         </tr>
       </tfoot>
     </table>
@@ -306,9 +336,9 @@ export function openJobSheet(booking: any) {
             </div>
           </div>
           <div class="flex-row">
-            <div><span class="lbl">Tech Name & Sign :</span> ___________________________</div>
+            <div><span class="lbl">Tech Name & Sign :</span> <strong style="font-size:11px;">${techName}</strong> ___________</div>
             <div><span class="lbl">Date :</span> __________________</div>
-            <div><span class="lbl">Amount Collected :</span> __________________</div>
+            <div><span class="lbl">Amount Collected :</span> <strong>${invoiceAmount}</strong></div>
           </div>
         </td>
       </tr>
@@ -337,5 +367,85 @@ export function openJobSheet(booking: any) {
   }
   printWindow.document.write(html);
   printWindow.document.close();
+}
+
+export function openPartBill(order: any) {
+  const orderNo = order._id?.slice(-8).toUpperCase() || "N/A";
+  const createdDate = order.createdAt ? new Date(order.createdAt).toLocaleDateString("en-IN") : "N/A";
+  const customerName = order.contactData?.name || "—";
+  const customerPhone = order.contactData?.phone || "—";
+  const address = order.contactData?.address || "—";
+  
+  const itemsHtml = order.items?.map((item: any) => `
+    <tr>
+      <td style="padding:10px; border:1px solid #eee;">${item.partId?.name || 'Spare Part'}</td>
+      <td style="padding:10px; border:1px solid #eee; text-align:center;">${item.quantity}</td>
+      <td style="padding:10px; border:1px solid #eee; text-align:right;">${item.partId?.price || 'TBD'}</td>
+    </tr>
+  `).join("") || "<tr><td colspan='3' style='text-align:center; padding:20px;'>No items found</td></tr>";
+
+  const html = \`<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: sans-serif; padding: 40px; color: #333; line-height: 1.6; }
+  .header { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 20px; margin-bottom: 30px; }
+  .logo { font-size: 28px; font-weight: 800; }
+  .logo b { color: #e0133a; }
+  .invoice-info { text-align: right; }
+  .section { margin-bottom: 30px; }
+  .section-title { font-weight: bold; text-transform: uppercase; font-size: 12px; color: #666; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; background: #f9f9f9; padding: 10px; border: 1px solid #eee; }
+  .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #999; border-top: 1px solid #eee; padding-top: 20px; }
+  @media print { .no-print { display: none; } }
+</style>
+</head>
+<body>
+  <div class="no-print" style="margin-bottom: 20px;">
+    <button onclick="window.print()" style="padding: 10px 20px; background: #000; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Print Invoice</button>
+  </div>
+  <div class="header">
+    <div class="logo">Fixxer<b>.</b></div>
+    <div class="invoice-info">
+      <h1 style="margin:0; font-size:24px;">TAX INVOICE</h1>
+      <p style="margin:5px 0 0 0;">Order #\${orderNo}</p>
+      <p style="margin:2px 0 0 0;">Date: \${createdDate}</p>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-title">Shipping Address</div>
+    <p style="margin:0; font-weight:bold;">\${customerName}</p>
+    <p style="margin:2px 0 0 0;">\${address}</p>
+    <p style="margin:2px 0 0 0;">Phone: \${customerPhone}</p>
+  </div>
+  <div class="section">
+    <div class="section-title">Order Items</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Item Description</th>
+          <th style="text-align:center;">Qty</th>
+          <th style="text-align:right;">Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        \${itemsHtml}
+      </tbody>
+    </table>
+  </div>
+  <div class="footer">
+    <p>Thank you for shopping with Fixxer. This is a computer-generated invoice.</p>
+    <p>www.fixer.in | support@fixer.in</p>
+  </div>
+</body>
+</html>\`;
+
+  const printWindow = window.open("", "_blank", "width=800,height=800");
+  if (printWindow) {
+    printWindow.document.write(html);
+    printWindow.document.close();
+  }
 }
 

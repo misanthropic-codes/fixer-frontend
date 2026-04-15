@@ -6,6 +6,7 @@ import Navbar from "@/app/components/Navbar";
 import Footer from "@/app/components/Footer";
 import { useAuth } from "@/app/context/AuthContext";
 import { API_URL } from "@/app/config";
+import { openJobSheet, openPartBill } from "@/app/admin/utils/jobsheet";
 
 type TabType = "repairs" | "parts";
 
@@ -194,11 +195,20 @@ function MyBookingsContent() {
                             <p className="text-[10px] uppercase font-black tracking-widest text-on-surface-variant mb-2">Service Charges</p>
                             <p className="text-3xl font-headline font-bold text-on-surface">Verified</p>
                             <p className="text-xs text-on-surface-variant mt-2">Final pricing shared after inspection. No upfront payment.</p>
-                            <hr className="my-5 border-outline-variant/50" />
-                            <div className="flex items-center justify-center gap-2 text-primary font-bold text-xs">
+                            <div className="flex items-center justify-center gap-2 text-primary font-bold text-xs my-4">
                                <span className="material-symbols-outlined text-sm">shield_with_heart</span>
-                               60 Days Warranty Included
+                               {booking.jobDetails?.warrantyPeriod || '60 Days'} Warranty Included
                             </div>
+
+                            {booking.isBilled && (
+                              <button 
+                                onClick={() => openJobSheet(booking)}
+                                className="mt-4 w-full h-11 rounded-xl bg-zinc-900 text-white text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-black transition-colors"
+                              >
+                                <span className="material-symbols-outlined text-lg">download</span>
+                                Download Bill
+                              </button>
+                            )}
                          </div>
                       </div>
                     </article>
@@ -263,6 +273,16 @@ function MyBookingsContent() {
                                    <p className="text-[10px] font-black uppercase tracking-widest text-primary">Live Tracking</p>
                                    <p className="text-sm mt-1 font-bold">{order.courierTracking.courierName}: {order.courierTracking.trackingNumber}</p>
                                 </div>
+                              )}
+
+                              {order.status === 'DELIVERED' && (
+                                <button 
+                                  onClick={() => openPartBill(order)}
+                                  className="mt-6 w-full h-11 rounded-xl bg-primary text-on-primary text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:scale-[0.98] transition-all shadow-lg shadow-primary/20"
+                                >
+                                  <span className="material-symbols-outlined text-lg">download</span>
+                                  Download Bill
+                                </button>
                               )}
                            </div>
                         </div>

@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import { openJobSheet } from "@/app/admin/utils/jobsheet";
+import ManageVisitsModal from "./ManageVisitsModal";
+import Link from "next/link";
 
 const STATUSES = ["ALL", "PENDING", "CONFIRMED", "ASSIGNED", "IN_PROGRESS", "COMPLETED", "RESCHEDULED", "CANCELLED"];
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1";
@@ -10,6 +12,7 @@ const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1";
 export default function AdminBookingsPage() {
   const { token } = useAuth();
   const [bookings, setBookings] = useState<any[]>([]);
+  const [technicians, setTechnicians] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState("ALL");
@@ -17,6 +20,7 @@ export default function AdminBookingsPage() {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [noteModal, setNoteModal] = useState<string | null>(null);
   const [noteText, setNoteText] = useState("");
+  const [visitModal, setVisitModal] = useState<string | null>(null);
 
   const limit = 15;
   const totalPages = Math.ceil(total / limit);
@@ -41,6 +45,15 @@ export default function AdminBookingsPage() {
 
   useEffect(() => {
     fetchBookings();
+    if (token && technicians.length === 0) {
+      fetch(`${API}/admin/technicians`, { headers: { Authorization: `Bearer ${token}` } })
+        .then(r => r.json())
+        .then(res => {
+          if (Array.isArray(res)) setTechnicians(res);
+          else console.error("Expected array but got", res);
+        })
+        .catch(console.error);
+    }
   }, [token, page, status]);
 
   const handleStatusChange = async (id: string, newStatus: string) => {
@@ -50,6 +63,22 @@ export default function AdminBookingsPage() {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
+      });
+      fetchBookings();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  const handleAssignTechnician = async (id: string, technicianId: string) => {
+    setUpdatingId(id);
+    try {
+      await fetch(`${API}/admin/bookings/${id}/assign`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ technicianId }),
       });
       fetchBookings();
     } catch (err) {
@@ -125,7 +154,7 @@ export default function AdminBookingsPage() {
               <th>Booking ID</th>
               <th>Customer</th>
               <th>Service</th>
-              <th>Phone</th>
+              <th>Technician</th>
               <th>Status</th>
               <th>Date</th>
               <th>Actions</th>
@@ -150,7 +179,20 @@ export default function AdminBookingsPage() {
                   <td style={{ fontFamily: "monospace", fontSize: 11 }}>{b._id?.slice(-8)}</td>
                   <td>{b.userId?.fullName || b.userId?.phone || "—"}</td>
                   <td>{b.serviceId?.name || "—"}</td>
-                  <td>{b.contactPhone || "—"}</td>
+                  <td>
+                    <select
+                      className="admin-input admin-select"
+                      style={{ height: 28, fontSize: 11, width: 110, padding: "0 20px 0 8px" }}
+                      value={b.technicianId?._id || b.technicianId || ""}
+                      onChange={(e) => handleAssignTechnician(b._id, e.target.value)}
+                      disabled={updatingId === b._id}
+                    >
+                      <option value="">Unassigned</option>
+                      {technicians.map((t) => (
+                        <option key={t._id} value={t._id}>{t.name}</option>
+                      ))}
+                    </select>
+                  </td>
                   <td>
                     <span className={`admin-badge admin-badge-${b.status?.toLowerCase()}`}>
                       {b.status?.replace("_", " ")}
@@ -158,10 +200,13 @@ export default function AdminBookingsPage() {
                   </td>
                   <td>{b.createdAt ? new Date(b.createdAt).toLocaleDateString() : "—"}</td>
                   <td>
-                    <div style={{ display: "flex", gap: 4 }}>
+                    <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                      <Link href={`/admin/bookings/${b._id}`} className="admin-btn admin-btn-secondary admin-btn-sm" style={{ padding: "6px 10px" }} title="Details">
+                        <span className="material-symbols-outlined" style={{ fontSize: 16 }}>visibility</span>
+                      </Link>
                       <select
                         className="admin-input admin-select"
-                        style={{ height: 32, fontSize: 11, width: 130, padding: "0 28px 0 8px" }}
+                        style={{ height: 30, fontSize: 11, width: 115, padding: "0 22px 0 8px" }}
                         value={b.status}
                         onChange={(e) => handleStatusChange(b._id, e.target.value)}
                         disabled={updatingId === b._id}
@@ -172,14 +217,24 @@ export default function AdminBookingsPage() {
                       </select>
                       <button
                         className="admin-btn admin-btn-ghost admin-btn-sm"
+                        style={{ padding: "6px" }}
                         onClick={() => setNoteModal(b._id)}
-                        title="Add note"
+                        title="Add Admin Note"
                       >
                         <span className="material-symbols-outlined" style={{ fontSize: 16 }}>sticky_note_2</span>
                       </button>
                       <button
+                        className="admin-btn admin-btn-ghost admin-btn-sm"
+                        style={{ padding: "6px" }}
+                        onClick={() => setVisitModal(b._id)}
+                        title="Manage Visits & Parts"
+                      >
+                        <span className="material-symbols-outlined" style={{ fontSize: 16 }}>build</span>
+                      </button>
+                      <button
                         className="admin-btn admin-btn-primary admin-btn-sm"
-                        style={{ whiteSpace: "nowrap" }}
+                        style={{ padding: "6px 10px" }}
+                        title="Print Job Sheet"
                         onClick={async () => {
                           try {
                             const res = await fetch(`${API}/admin/bookings/${b._id}`, {
@@ -192,8 +247,7 @@ export default function AdminBookingsPage() {
                           }
                         }}
                       >
-                        <span className="material-symbols-outlined" style={{ fontSize: 14 }}>print</span>
-                        Job Sheet
+                        <span className="material-symbols-outlined" style={{ fontSize: 16 }}>print</span>
                       </button>
                     </div>
                   </td>
@@ -254,6 +308,15 @@ export default function AdminBookingsPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Manage Visits Modal */}
+      {visitModal && (
+        <ManageVisitsModal 
+          bookingId={visitModal} 
+          token={token || ""} 
+          onClose={() => setVisitModal(null)} 
+        />
       )}
     </div>
   );
