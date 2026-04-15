@@ -27,7 +27,18 @@ export default function BookingDetailPage() {
     diagnosis: "",
     workDone: "",
     recommendations: "",
-    warrantyPeriod: "60 Days"
+    warrantyPeriod: "60 Days",
+    asset: "",
+    warrantyCode: "",
+    warrantyDesc: "",
+    assetSaleDate: "",
+    assetExpiryDate: "",
+    contractCode: "",
+    contractDesc: "",
+    contractStartDate: "",
+    contractExpiryDate: "",
+    visitCategory: "",
+    invoiceNumber: ""
   });
   const [productDetails, setProductDetails] = useState({
     brand: "",
@@ -64,7 +75,18 @@ export default function BookingDetailPage() {
         diagnosis: data.jobDetails?.diagnosis || "",
         workDone: data.jobDetails?.workDone || "",
         recommendations: data.jobDetails?.recommendations || "",
-        warrantyPeriod: data.jobDetails?.warrantyPeriod || "60 Days"
+        warrantyPeriod: data.jobDetails?.warrantyPeriod || "60 Days",
+        asset: data.jobDetails?.asset || "",
+        warrantyCode: data.jobDetails?.warrantyCode || "",
+        warrantyDesc: data.jobDetails?.warrantyDesc || "",
+        assetSaleDate: data.jobDetails?.assetSaleDate || "",
+        assetExpiryDate: data.jobDetails?.assetExpiryDate || "",
+        contractCode: data.jobDetails?.contractCode || "",
+        contractDesc: data.jobDetails?.contractDesc || "",
+        contractStartDate: data.jobDetails?.contractStartDate || "",
+        contractExpiryDate: data.jobDetails?.contractExpiryDate || "",
+        visitCategory: data.jobDetails?.visitCategory || "",
+        invoiceNumber: data.jobDetails?.invoiceNumber || ""
       });
 
       // Robust population for Product Details
@@ -422,6 +444,62 @@ export default function BookingDetailPage() {
                       onChange={e => setJobDetails({...jobDetails, warrantyPeriod: e.target.value})}
                       disabled={booking.isBilled}
                     />
+                  </div>
+                </div>
+
+                <div style={{ padding: '12px 0', borderTop: '1px solid var(--admin-border)', marginTop: 8 }}>
+                  <h4 style={{ fontSize: 12, textTransform: 'uppercase', color: 'var(--admin-text-muted)', marginBottom: 12 }}>Asset & Warranty Details</h4>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                    <div>
+                      <label className="admin-label">Asset</label>
+                      <input className="admin-input" value={jobDetails.asset} onChange={e => setJobDetails({...jobDetails, asset: e.target.value})} placeholder="Asset ID / Name" />
+                    </div>
+                    <div>
+                      <label className="admin-label">Invoice Number</label>
+                      <input className="admin-input" value={jobDetails.invoiceNumber} onChange={e => setJobDetails({...jobDetails, invoiceNumber: e.target.value})} placeholder="INV-2026-..." />
+                    </div>
+                    <div>
+                      <label className="admin-label">Warranty Code</label>
+                      <input className="admin-input" value={jobDetails.warrantyCode} onChange={e => setJobDetails({...jobDetails, warrantyCode: e.target.value})} placeholder="W-990" />
+                    </div>
+                    <div>
+                      <label className="admin-label">Warranty Desc</label>
+                      <input className="admin-input" value={jobDetails.warrantyDesc} onChange={e => setJobDetails({...jobDetails, warrantyDesc: e.target.value})} placeholder="Manufacturer Standard" />
+                    </div>
+                    <div>
+                      <label className="admin-label">Asset Sale Date</label>
+                      <input className="admin-input" value={jobDetails.assetSaleDate} onChange={e => setJobDetails({...jobDetails, assetSaleDate: e.target.value})} placeholder="DD/MM/YYYY" />
+                    </div>
+                    <div>
+                      <label className="admin-label">Asset Expiry Date</label>
+                      <input className="admin-input" value={jobDetails.assetExpiryDate} onChange={e => setJobDetails({...jobDetails, assetExpiryDate: e.target.value})} placeholder="DD/MM/YYYY" />
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ padding: '12px 0', borderTop: '1px solid var(--admin-border)' }}>
+                  <h4 style={{ fontSize: 12, textTransform: 'uppercase', color: 'var(--admin-text-muted)', marginBottom: 12 }}>Contract & Category</h4>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                    <div>
+                      <label className="admin-label">Contract Code</label>
+                      <input className="admin-input" value={jobDetails.contractCode} onChange={e => setJobDetails({...jobDetails, contractCode: e.target.value})} placeholder="C-100" />
+                    </div>
+                    <div>
+                      <label className="admin-label">Contract Desc</label>
+                      <input className="admin-input" value={jobDetails.contractDesc} onChange={e => setJobDetails({...jobDetails, contractDesc: e.target.value})} placeholder="Annual Maintenance" />
+                    </div>
+                    <div>
+                      <label className="admin-label">Contract Start Date</label>
+                      <input className="admin-input" value={jobDetails.contractStartDate} onChange={e => setJobDetails({...jobDetails, contractStartDate: e.target.value})} placeholder="DD/MM/YYYY" />
+                    </div>
+                    <div>
+                      <label className="admin-label">Contract Expiry Date</label>
+                      <input className="admin-input" value={jobDetails.contractExpiryDate} onChange={e => setJobDetails({...jobDetails, contractExpiryDate: e.target.value})} placeholder="DD/MM/YYYY" />
+                    </div>
+                    <div>
+                      <label className="admin-label">Visit Category</label>
+                      <input className="admin-input" value={jobDetails.visitCategory} onChange={e => setJobDetails({...jobDetails, visitCategory: e.target.value})} placeholder="Standard / Breakdown" />
+                    </div>
                   </div>
                 </div>
               </div>

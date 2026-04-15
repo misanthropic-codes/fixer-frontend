@@ -183,15 +183,15 @@ export function openJobSheet(booking: any) {
         </td>
         <td style="width:33.4%;">
           <table class="no-border-table" style="font-size:9px;">
-            <tr><td class="lbl" style="width:85px;">Asset:</td><td></td></tr>
-            <tr><td class="lbl">Warranty Code & Desc:</td><td></td></tr>
-            <tr><td class="lbl">Sale Date:</td><td></td></tr>
-            <tr><td class="lbl">Expiry Date:</td><td></td></tr>
-            <tr><td class="lbl">Contract Code & Desc:</td><td></td></tr>
-            <tr><td class="lbl">Start Date:</td><td></td></tr>
-            <tr><td class="lbl">Expiry Date:</td><td></td></tr>
-            <tr><td class="lbl">Visit Category:</td><td></td></tr>
-            <tr><td class="lbl">Invoice Number:</td><td></td></tr>
+            <tr><td class="lbl" style="width:85px;">Asset:</td><td>${booking.jobDetails?.asset || ""}</td></tr>
+            <tr><td class="lbl">Warranty Code & Desc:</td><td>${booking.jobDetails?.warrantyCode || ""} ${booking.jobDetails?.warrantyDesc ? `- ${booking.jobDetails.warrantyDesc}` : ""}</td></tr>
+            <tr><td class="lbl">Sale Date:</td><td>${booking.jobDetails?.assetSaleDate || ""}</td></tr>
+            <tr><td class="lbl">Expiry Date:</td><td>${booking.jobDetails?.assetExpiryDate || ""}</td></tr>
+            <tr><td class="lbl">Contract Code & Desc:</td><td>${booking.jobDetails?.contractCode || ""} ${booking.jobDetails?.contractDesc ? `- ${booking.jobDetails.contractDesc}` : ""}</td></tr>
+            <tr><td class="lbl">Start Date:</td><td>${booking.jobDetails?.contractStartDate || ""}</td></tr>
+            <tr><td class="lbl">Expiry Date:</td><td>${booking.jobDetails?.contractExpiryDate || ""}</td></tr>
+            <tr><td class="lbl">Visit Category:</td><td>${booking.jobDetails?.visitCategory || ""}</td></tr>
+            <tr><td class="lbl">Invoice Number:</td><td>${booking.jobDetails?.invoiceNumber || ""}</td></tr>
             <tr><td class="lbl">UID No:</td><td style="font-size:8px; word-break:break-all;">${fullId}</td></tr>
           </table>
         </td>

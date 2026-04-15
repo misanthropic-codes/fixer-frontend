@@ -100,9 +100,14 @@ export default function TechniciansPage() {
                   <td style={{ fontWeight: 600 }}>{t.name}</td>
                   <td>{t.phone}</td>
                   <td>
-                    <span className={`admin-badge admin-badge-${t.availabilityStatus === 'AVAILABLE' ? 'success' : 'warning'}`}>
-                      {t.availabilityStatus}
-                    </span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                      <span className={`admin-badge admin-badge-${t.isActive ? 'success' : 'ghost'}`} style={{ zoom: 0.8 }}>
+                        {t.isActive ? 'ACCOUNT ACTIVE' : 'ACCOUNT INACTIVE'}
+                      </span>
+                      <span className={`admin-badge admin-badge-${t.availabilityStatus === 'AVAILABLE' ? 'success' : 'warning'}`} style={{ zoom: 0.8 }}>
+                        {t.availabilityStatus}
+                      </span>
+                    </div>
                   </td>
                   <td>{t.totalCompletedJobs}</td>
                   <td>{t.averageRating} ★</td>
