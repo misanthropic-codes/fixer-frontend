@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
-import Link from "next/link";
+import { openJobSheet } from "@/app/admin/utils/jobsheet";
 
 const STATUSES = ["ALL", "PENDING", "CONFIRMED", "ASSIGNED", "IN_PROGRESS", "COMPLETED", "RESCHEDULED", "CANCELLED"];
 const API = "http://localhost:3000/api/v1";
@@ -164,6 +164,24 @@ export default function AdminBookingsPage() {
                         title="Add note"
                       >
                         <span className="material-symbols-outlined" style={{ fontSize: 16 }}>sticky_note_2</span>
+                      </button>
+                      <button
+                        className="admin-btn admin-btn-primary admin-btn-sm"
+                        style={{ whiteSpace: "nowrap" }}
+                        onClick={async () => {
+                          try {
+                            const res = await fetch(`${API}/admin/bookings/${b._id}`, {
+                              headers: { Authorization: `Bearer ${token}` },
+                            });
+                            const data = await res.json();
+                            openJobSheet(data);
+                          } catch (err) {
+                            console.error(err);
+                          }
+                        }}
+                      >
+                        <span className="material-symbols-outlined" style={{ fontSize: 14 }}>print</span>
+                        Job Sheet
                       </button>
                     </div>
                   </td>
