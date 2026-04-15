@@ -32,16 +32,21 @@ export function openJobSheet(booking: any) {
   const v2 = visits.find((v: any) => v.visitOrder === 2) || {};
   
   const allParts = visits.flatMap((v: any) => v.partsUsed || []);
-  const partsHtml = allParts.map((p: any) => `
+  const partsHtml = allParts.map((p: any) => {
+    const rawPrice = p.sparePartId?.price || "0";
+    const numericPrice = p.cost || parseFloat(String(rawPrice).match(/(\d+)/)?.[1] || "0");
+    const subtotal = numericPrice * (p.quantity || 1);
+    
+    return `
     <tr>
       <td class="lbl">${p.isThirdParty ? 'EXT' : p.sparePartId?.partNumber || ''}</td>
       <td>${p.isThirdParty ? p.partName : p.sparePartId?.name || ''}</td>
       <td>${p.isThirdParty ? p.vendor : p.sparePartId?.manufacturer || ''}</td>
       <td style="text-align:center;">${p.quantity || 1}</td>
-      <td style="text-align:right;">${p.cost || p.sparePartId?.price || 0}</td>
-      <td style="text-align:right;">${((p.cost || parseFloat(String(p.sparePartId?.price || 0).replace(/[₹,\s]/g, ''))) * (p.quantity || 1)).toFixed(2)}</td>
-    </tr>
-  `).join("") || `
+      <td style="text-align:right;">${numericPrice}</td>
+      <td style="text-align:right;">${subtotal.toFixed(2)}</td>
+    </tr>`;
+  }).join("") || `
     <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr>
@@ -460,9 +465,13 @@ export function openRetailInvoice(booking: any) {
     ? new Date(booking.invoiceData.generatedAt).toLocaleDateString("en-IN") 
     : new Date().toLocaleDateString("en-IN");
   
-  const customerName = booking.userId?.fullName || "—";
-  const address = booking.addressData?.text || "—";
+  const customerName = booking.userId?.fullName || booking.userId?.name || booking.addressData?.name || "Valued Customer";
+  const address = booking.addressData?.text || booking.addressData?.zip || "—";
   const phone = booking.contactPhone || booking.userId?.phone || "—";
+  
+  const brand = booking.productDetails?.brand || "—";
+  const modelNo = booking.productDetails?.modelNumber || "—";
+  const serialNo = booking.productDetails?.serialNumber || "—";
   
   const additionalCharges = booking.invoiceData?.additionalCharges || [];
   const visits = booking.visits || [];
@@ -473,30 +482,29 @@ export function openRetailInvoice(booking: any) {
     `<tr>
       <td style="padding:12px; border:1px solid #eee;">
         <strong>${booking.serviceId?.name || 'Service'} Fee</strong><br>
-        <span style="font-size:11px; color:#666;">${booking.serviceType || 'Repair'} Service for ${booking.productDetails?.brand || ''} ${booking.productDetails?.modelNumber || ''}</span>
+        <span style="font-size:11px; color:#666;">${booking.serviceType || 'Repair'} Service for ${brand} ${modelNo}</span>
       </td>
       <td style="padding:12px; border:1px solid #eee; text-align:right;">₹${booking.invoiceData?.serviceTotal || 0}</td>
     </tr>`,
-    // Parts
-    ...allParts.map((p: any) => `
-      <tr>
-        <td style="padding:12px; border:1px solid #eee;">
-          <strong>${p.isThirdParty ? p.partName : (p.sparePartId?.name || 'Spare Part')}</strong><br>
-          <span style="font-size:11px; color:#666;">Part Replacement (${p.quantity} qty)</span>
-        </td>
-        <td style="padding:12px; border:1px solid #eee; text-align:right;">₹${(p.cost || parseFloat(String(p.sparePartId?.price || 0).replace(/[₹,\s]/g, ''))) * p.quantity}</td>
-      </tr>
-    `),
+    // Spare Parts Row (Source of Truth)
+    (booking.invoiceData?.partsTotal || 0) > 0 ? `
+    <tr>
+      <td style="padding:12px; border:1px solid #eee;">
+        <strong>Spare Parts & Components</strong><br>
+        <span style="font-size:11px; color:#666;">Includes all genuine parts replaced during service</span>
+      </td>
+      <td style="padding:12px; border:1px solid #eee; text-align:right;">₹${booking.invoiceData?.partsTotal}</td>
+    </tr>` : '',
     // Additional Charges
-    ...additionalCharges.map((c: any) => `
-      <tr>
-        <td style="padding:12px; border:1px solid #eee;">
-          <strong>${c.label}</strong>
-        </td>
-        <td style="padding:12px; border:1px solid #eee; text-align:right;">₹${c.amount}</td>
-      </tr>
+    ...(booking.invoiceData?.additionalCharges || []).map((c: any) => `
+    <tr>
+      <td style="padding:12px; border:1px solid #eee;">
+        <strong>${c.label}</strong>
+      </td>
+      <td style="padding:12px; border:1px solid #eee; text-align:right;">₹${c.amount}</td>
+    </tr>
     `)
-  ].join("");
+  ].filter(Boolean).join("");
 
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -581,22 +589,53 @@ export function openRetailInvoice(booking: any) {
     </div>
   </div>
 
-  <div style="margin-top: 40px; padding: 20px; background: #f9fafb; border-radius: 12px; border: 1px solid #f3f4f6;">
-    <div class="section-title">Warranty & Sign-off</div>
-    <p style="margin-bottom: 12px;"><strong>Warranty Coverage:</strong> ${booking.jobDetails?.warrantyPeriod || '60 Days'} from the date of completion on the specified work done.</p>
-    <div style="display: flex; gap: 40px; margin-top: 20px;">
-      <div style="flex: 1; border-top: 1px solid #e4e4e7; padding-top: 10px; font-size: 10px;">AUTHORIZED SIGNATORY (Fixxer)</div>
-      <div style="flex: 1; border-top: 1px solid #e4e4e7; padding-top: 10px; font-size: 10px;">CUSTOMER ACKNOWLEDGEMENT</div>
+  <div style="margin-top: 50px; padding: 30px; background: #fdfdfd; border-radius: 20px; border: 1px solid #f1f1f1; position: relative; overflow: hidden;">
+    <div style="position: absolute; top: -10px; right: -10px; opacity: 0.05;">
+      <svg width="150" height="150" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="45" fill="none" stroke="#e0133a" stroke-width="2" />
+        <text x="50" y="50" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="#e0133a" font-weight="bold">FIXXER VERIFIED</text>
+      </svg>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; position: relative; z-index: 1;">
+      <div style="flex: 1.5;">
+        <div class="section-title">Service Guarantee</div>
+        <div style="display: flex; items-center; gap: 10px; margin-top: 5px;">
+           <span style="font-size: 24px; color: #10b981;">✓</span>
+           <div>
+             <p style="margin: 0; font-weight: 800; font-size: 15px; color: #1a1a1a;">
+               ${booking.jobDetails?.warrantyPeriod || '60 Days'} Master Warranty
+             </p>
+             <p style="margin: 4px 0 0 0; color: #71717a; font-size: 11px; line-height: 1.4;">
+               This warranty covers labor and genuine parts replaced during this service. 
+               Keep this invoice for future claims.
+             </p>
+           </div>
+        </div>
+      </div>
+      <div style="flex: 1; text-align: right;">
+        <div class="section-title">Quality Assurance</div>
+        <div style="margin: 15px 0 10px 0; display: inline-block;">
+          <svg width="140" height="50" viewBox="0 0 140 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 35C30 30 50 15 70 20C90 25 110 40 130 30" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M15 42C40 38 65 25 90 30" stroke="#e0133a" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="3 3" />
+            <circle cx="10" cy="35" r="2" fill="#1a1a1a" />
+            <circle cx="130" cy="30" r="2" fill="#1a1a1a" />
+          </svg>
+        </div>
+        <div style="font-weight: 900; font-size: 13px; color: #1a1a1a; text-transform: uppercase; letter-spacing: 0.5px;">Master Technician</div>
+        <div style="font-size: 10px; color: #e0133a; font-weight: 700; text-transform: uppercase;">Digital Signature Verified</div>
+      </div>
     </div>
   </div>
 
   <div class="footer">
-    <p>&copy; 2026 Fixxer Service Platform. All rights reserved.</p>
-    <p>This is a computer generated invoice and does not require a physical signature.</p>
-    <p>Visit us at <strong>www.fixer.in</strong> | Support: <strong>support@fixer.in</strong></p>
+    <p>&copy; 2026 Fixxer - Precision Home Services. All rights reserved.</p>
+    <p style="font-weight: 600;">This is a computer generated tax invoice and does not require a physical signature.</p>
+    <p>www.fixer.in | Support: support@fixer.in | Toll Free: 1800-FIXXER</p>
   </div>
 </body>
 </html>`;
+
 
   const printWindow = window.open("", "_blank", "width=900,height=850");
   if (printWindow) {

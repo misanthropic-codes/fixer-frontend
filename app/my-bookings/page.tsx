@@ -205,8 +205,8 @@ function MyBookingsContent() {
                                 onClick={() => openRetailInvoice(booking)}
                                 className="mt-4 w-full h-11 rounded-xl bg-zinc-900 text-white text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-black transition-colors"
                               >
-                                <span className="material-symbols-outlined text-lg">download</span>
-                                Download Bill
+                                <span className="material-symbols-outlined text-lg">description</span>
+                                Download Service Bill
                               </button>
                             )}
                          </div>
@@ -280,8 +280,8 @@ function MyBookingsContent() {
                                   onClick={() => openPartBill(order)}
                                   className="mt-6 w-full h-11 rounded-xl bg-primary text-on-primary text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:scale-[0.98] transition-all shadow-lg shadow-primary/20"
                                 >
-                                  <span className="material-symbols-outlined text-lg">download</span>
-                                  Download Bill
+                                  <span className="material-symbols-outlined text-lg">receipt_long</span>
+                                  Download Parts Invoice
                                 </button>
                               )}
                            </div>
