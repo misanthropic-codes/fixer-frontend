@@ -487,14 +487,14 @@ export function openRetailInvoice(booking: any) {
       <td style="padding:12px; border:1px solid #eee; text-align:right;">₹${booking.invoiceData?.serviceTotal || 0}</td>
     </tr>`,
     // Spare Parts Row (Source of Truth)
-    (booking.invoiceData?.partsTotal || 0) > 0 ? `
+    ...(booking.invoiceData?.spareParts || []).map((p: any) => `
     <tr>
       <td style="padding:12px; border:1px solid #eee;">
-        <strong>Spare Parts & Components</strong><br>
-        <span style="font-size:11px; color:#666;">Includes all genuine parts replaced during service</span>
+        <strong>${p.partName}</strong><br>
+        <span style="font-size:11px; color:#666;">Qty: ${p.quantity} | ${p.isThirdParty ? 'Third Party' : 'Inventory'} Component</span>
       </td>
-      <td style="padding:12px; border:1px solid #eee; text-align:right;">₹${booking.invoiceData?.partsTotal}</td>
-    </tr>` : '',
+      <td style="padding:12px; border:1px solid #eee; text-align:right;">₹${p.cost * p.quantity}</td>
+    </tr>`),
     // Additional Charges
     ...(booking.invoiceData?.additionalCharges || []).map((c: any) => `
     <tr>

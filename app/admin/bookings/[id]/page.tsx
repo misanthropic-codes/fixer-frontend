@@ -58,15 +58,22 @@ export default function BookingDetailPage() {
       if (data.visits) {
         setVisits(data.visits);
       }
-      if (data.jobDetails) {
-        setJobDetails({
-          diagnosis: data.jobDetails.diagnosis || "",
-          workDone: data.jobDetails.workDone || "",
-          recommendations: data.jobDetails.recommendations || "",
-          warrantyPeriod: data.jobDetails.warrantyPeriod || "60 Days"
-        });
-      }
-      if (data.productDetails) setProductDetails(data.productDetails);
+      
+      // Robust population for Job Details
+      setJobDetails({
+        diagnosis: data.jobDetails?.diagnosis || "",
+        workDone: data.jobDetails?.workDone || "",
+        recommendations: data.jobDetails?.recommendations || "",
+        warrantyPeriod: data.jobDetails?.warrantyPeriod || "60 Days"
+      });
+
+      // Robust population for Product Details
+      setProductDetails({
+        brand: data.productDetails?.brand || "",
+        modelNumber: data.productDetails?.modelNumber || "",
+        serialNumber: data.productDetails?.serialNumber || ""
+      });
+
       if (data.invoiceData) {
         setServiceFee(data.invoiceData.serviceTotal || 0);
         setAdditionalCharges(data.invoiceData.additionalCharges || []);
@@ -212,6 +219,17 @@ export default function BookingDetailPage() {
     }
   };
 
+  const getWarrantyStatus = () => {
+    if (!booking.warrantyExpiry) return null;
+    const expiry = new Date(booking.warrantyExpiry);
+    const now = new Date();
+    const diffTime = expiry.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays <= 0) return { label: "Expired", color: "#64748b", bg: "#f1f5f9" };
+    return { label: `Active (${diffDays} Days Left)`, color: "#16a34a", bg: "#f0fdf4" };
+  };
+
   if (loading) return <div style={{ padding: 40 }}>Loading booking details...</div>;
   if (!booking) return <div style={{ padding: 40 }}>Booking not found.</div>;
 
@@ -223,7 +241,25 @@ export default function BookingDetailPage() {
             <span className="material-symbols-outlined">arrow_back</span>
           </button>
           <div>
-            <h2 style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.5 }}>Booking #{booking._id.slice(-8)}</h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <h1 style={{ fontSize: 24, margin: 0 }}>Service #{booking._id.slice(-6).toUpperCase()}</h1>
+            {booking.serviceType === 'WARRANTY_CHECK' && (
+              <span className="admin-badge admin-badge-warning">WARRANTY CLAIM</span>
+            )}
+            {getWarrantyStatus() && (
+              <span style={{ 
+                padding: "4px 12px", 
+                borderRadius: 20, 
+                fontSize: 12, 
+                fontWeight: 600, 
+                color: getWarrantyStatus()?.color, 
+                backgroundColor: getWarrantyStatus()?.bg,
+                border: `1px solid ${getWarrantyStatus()?.color}44`
+              }}>
+                Warranty: {getWarrantyStatus()?.label}
+              </span>
+            )}
+          </div>
             <p style={{ fontSize: 13, color: "var(--admin-text-dim)", marginTop: 4 }}>
               Created on {new Date(booking.createdAt).toLocaleString()}
             </p>
@@ -255,7 +291,7 @@ export default function BookingDetailPage() {
                   onClick={handleUpdateProductDetails}
                   disabled={updating || booking.isBilled}
                 >
-                  Save Info
+                  {updating ? "Saving..." : "Save Info"}
                 </button>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
@@ -325,7 +361,7 @@ export default function BookingDetailPage() {
                   onClick={handleUpdateJobDetails}
                   disabled={updating || booking.isBilled}
                 >
-                  Save Entries
+                  {updating ? "Saving..." : "Save Entries"}
                 </button>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -395,7 +431,7 @@ export default function BookingDetailPage() {
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                 {visits.map((vis, i) => (
-                  <div key={vis._id} style={{ border: "1px solid var(--admin-border)", borderRadius: 8, padding: 12 }}>
+                  <div key={vis._id || `visit-${i}`} style={{ border: "1px solid var(--admin-border)", borderRadius: 8, padding: 12 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
                       <strong style={{ fontSize: 13 }}>Visit #{vis.visitOrder} <span style={{ color: "var(--admin-text-dim)", fontWeight: "normal" }}>({vis.status})</span></strong>
                       <span style={{ fontSize: 12, color: "var(--admin-text-dim)" }}>{new Date(vis.scheduledDate).toLocaleDateString()}</span>
@@ -439,7 +475,7 @@ export default function BookingDetailPage() {
                   </thead>
                   <tbody>
                     {allParts.map((p: any, idx: number) => (
-                      <tr key={idx} style={{ borderBottom: "1px solid var(--admin-border)" }}>
+                      <tr key={p._id || `part-${idx}`} style={{ borderBottom: "1px solid var(--admin-border)" }}>
                         <td style={{ padding: "12px 0", fontWeight: 500 }}>
                           {p.isThirdParty ? p.partName : (p.sparePartId?.name || p.sparePartId)}
                         </td>
@@ -561,7 +597,7 @@ export default function BookingDetailPage() {
                   onClick={handleSaveInvoiceManual}
                   disabled={updating}
                 >
-                  Save Bill
+                  {updating ? "Saving..." : "Save Bill"}
                 </button>
               )}
             </div>
@@ -580,7 +616,7 @@ export default function BookingDetailPage() {
               </div>
 
               {additionalCharges.map((charge, idx) => (
-                <div key={idx} style={{ display: "grid", gridTemplateColumns: "1fr 100px 32px", gap: 12, alignItems: 'center' }}>
+                <div key={charge._id || `charge-${idx}`} style={{ display: "grid", gridTemplateColumns: "1fr 100px 32px", gap: 12, alignItems: 'center' }}>
                   <input 
                     className="admin-input"
                     style={{ height: 32, padding: '4px 8px' }}

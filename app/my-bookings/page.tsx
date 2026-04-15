@@ -59,6 +59,39 @@ function MyBookingsContent() {
     }
   };
 
+  const handleClaimWarranty = async (bookingId: string) => {
+    if (!token || !confirm("Are you sure you want to claim warranty for this service? We will dispatch a master technician for a warranty check.")) return;
+    
+    try {
+      const res = await fetch(`${API_URL}/user/bookings/${bookingId}/claim-warranty`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (res.ok) {
+        alert("Warranty claim received! A new check-up booking has been created.");
+        fetchAllHistory();
+      } else {
+        const data = await res.json();
+        alert(data.message || "Could not claim warranty.");
+      }
+    } catch (err) {
+      alert("Network error.");
+    }
+  };
+
+  const getWarrantyStatus = (booking: any) => {
+    if (booking.status !== 'COMPLETED' || !booking.warrantyExpiry) return null;
+    
+    const expiry = new Date(booking.warrantyExpiry);
+    const now = new Date();
+    const diffTime = expiry.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays <= 0) return { label: "Expired", isActive: false };
+    return { label: `Active (${diffDays} Days Left)`, isActive: true };
+  };
+
   const activeCount = activeTab === "repairs" ? bookings.length : orders.length;
 
   return (
@@ -195,10 +228,29 @@ function MyBookingsContent() {
                             <p className="text-[10px] uppercase font-black tracking-widest text-on-surface-variant mb-2">Service Charges</p>
                             <p className="text-3xl font-headline font-bold text-on-surface">Verified</p>
                             <p className="text-xs text-on-surface-variant mt-2">Final pricing shared after inspection. No upfront payment.</p>
-                            <div className="flex items-center justify-center gap-2 text-primary font-bold text-xs my-4">
-                               <span className="material-symbols-outlined text-sm">shield_with_heart</span>
-                               {booking.jobDetails?.warrantyPeriod || '60 Days'} Warranty Included
+                            <div className="flex flex-col items-center justify-center gap-2 my-4">
+                               {getWarrantyStatus(booking) ? (
+                                 <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-2 ${getWarrantyStatus(booking)?.isActive ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-gray-50 text-gray-500 border border-gray-100'}`}>
+                                    <span className="material-symbols-outlined text-sm">{getWarrantyStatus(booking)?.isActive ? 'verified_user' : 'history'}</span>
+                                    Warranty {getWarrantyStatus(booking)?.label}
+                                 </div>
+                               ) : (
+                                 <div className="flex items-center justify-center gap-2 text-primary font-bold text-xs">
+                                   <span className="material-symbols-outlined text-sm">shield_with_heart</span>
+                                   {booking.jobDetails?.warrantyPeriod || '60 Days'} Warranty Included
+                                 </div>
+                               )}
                             </div>
+
+                            {booking.status === 'COMPLETED' && getWarrantyStatus(booking)?.isActive && (
+                              <button 
+                                onClick={() => handleClaimWarranty(booking._id)}
+                                className="mb-3 w-full h-11 rounded-xl bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-primary/20 transition-colors border border-primary/20"
+                              >
+                                <span className="material-symbols-outlined text-lg">medical_services</span>
+                                Claim Warranty
+                              </button>
+                            )}
 
                             {booking.isBilled && (
                               <button 
