@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 
-const API = "http://localhost:3000/api/v1";
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1";
 
 export default function AdminSparePartsPage() {
   const { token } = useAuth();
@@ -107,12 +107,18 @@ export default function AdminSparePartsPage() {
       name: "",
       partNumber: "",
       category: "",
+      subCategory: "",
       price: "",
       stock: 0,
       manufacturer: "",
       seller: "Fixxer OEM Hub",
       image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=800&auto=format&fit=crop",
       description: "",
+      warranty: "",
+      deliveryEta: "",
+      highlights: "",
+      compatibleModels: "",
+      supportsServiceBooking: false,
       slug: "",
     });
   };
@@ -242,16 +248,21 @@ export default function AdminSparePartsPage() {
                 <span className="material-symbols-outlined">close</span>
               </button>
             </div>
-            <div className="admin-modal-body" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+            <div className="admin-modal-body" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, maxHeight: "60vh", overflowY: "auto" }}>
               {[
                 { key: "name", label: "Name", full: false },
                 { key: "partNumber", label: "Part Number", full: false },
                 { key: "category", label: "Category", full: false },
+                { key: "subCategory", label: "Sub Category", full: false },
                 { key: "price", label: "Price", full: false },
                 { key: "stock", label: "Stock", full: false, type: "number" },
                 { key: "manufacturer", label: "Manufacturer", full: false },
-                { key: "seller", label: "Seller", full: true },
+                { key: "seller", label: "Seller", full: false },
+                { key: "warranty", label: "Warranty", full: false },
+                { key: "deliveryEta", label: "Delivery ETA", full: false },
                 { key: "image", label: "Image URL", full: true },
+                { key: "highlights", label: "Highlights (pipe-separated)", full: true },
+                { key: "compatibleModels", label: "Compatible Models (pipe-separated)", full: true },
                 { key: "slug", label: "Slug", full: true },
               ].map((field) => (
                 <div key={field.key} style={field.full ? { gridColumn: "1 / -1" } : {}}>

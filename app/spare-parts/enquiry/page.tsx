@@ -13,7 +13,7 @@ export default async function SparePartsEnquiryPage({
   // Fetch all spare parts from the backend API
   let spareParts = [];
   try {
-    const res = await fetch("http://localhost:3000/api/v1/spare-parts", {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1"}/spare-parts`, {
       cache: "no-store",
     });
     if (res.ok) {

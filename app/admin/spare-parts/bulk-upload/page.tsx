@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 
-const API = "http://localhost:3000/api/v1";
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1";
 
 interface UploadResult {
   totalProcessed: number;
@@ -253,9 +253,10 @@ export default function BulkUploadPage() {
         <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 16 }}>File Format Guide</h3>
         <div style={{ fontSize: 13, color: "var(--admin-text-dim)", lineHeight: 1.8 }}>
           <p><strong style={{ color: "var(--admin-text)" }}>Required columns:</strong> partNumber, name</p>
-          <p><strong style={{ color: "var(--admin-text)" }}>Optional columns:</strong> category, price, stock, manufacturer, seller, image</p>
+          <p><strong style={{ color: "var(--admin-text)" }}>Optional columns:</strong> category, subCategory, price, stock, manufacturer, seller, image, description, warranty, delivery eta, highlights, compatible models, supports service</p>
           <p><strong style={{ color: "var(--admin-text)" }}>Duplicate handling:</strong> Rows with existing partNumber will be updated (upsert)</p>
-          <p><strong style={{ color: "var(--admin-text)" }}>Column aliases:</strong> &quot;SKU&quot; → partNumber, &quot;MRP&quot; → price, &quot;Brand&quot; → manufacturer, &quot;Qty&quot; → stock</p>
+          <p><strong style={{ color: "var(--admin-text)" }}>Column aliases:</strong> &quot;SKU&quot; → partNumber, &quot;MRP&quot; → price, &quot;Brand&quot; → manufacturer, &quot;Qty&quot; → stock, &quot;sub category&quot; / &quot;type&quot; → subCategory</p>
+          <p><strong style={{ color: "var(--admin-text)" }}>Array fields:</strong> Use pipe &quot;|&quot; to separate multiple values in highlights and compatible models</p>
           <p><strong style={{ color: "var(--admin-text)" }}>Supported formats:</strong> .csv, .xlsx, .xls</p>
         </div>
       </div>

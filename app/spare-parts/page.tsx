@@ -26,12 +26,12 @@ export default async function SparePartsPage({
       limit: "24",
     }).toString();
 
-    const fetchParts = fetch(`http://localhost:3000/api/v1/spare-parts?${queryStr}`, {
+    const fetchParts = fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1"}/spare-parts?${queryStr}`, {
       cache: "no-store",
     });
 
     // 2. Fetch Distinct Categories
-    const fetchCats = fetch(`http://localhost:3000/api/v1/spare-parts/meta/categories`, {
+    const fetchCats = fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1"}/spare-parts/meta/categories`, {
       cache: "no-store",
     });
 

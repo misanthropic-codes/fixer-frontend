@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Navbar from "@/app/components/Navbar";
 import Footer from "@/app/components/Footer";
 import { useAuth } from "@/app/context/AuthContext";
+import { API_URL } from "@/app/config";
 
 type TabType = "repairs" | "parts";
 
@@ -39,10 +40,10 @@ function MyBookingsContent() {
     setLoading(true);
     try {
       const [ordersRes, bookingsRes] = await Promise.all([
-        fetch("http://localhost:3000/api/v1/user/part-orders", {
+        fetch(`${API_URL}/user/part-orders`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        fetch("http://localhost:3000/api/v1/user/bookings", {
+        fetch(`${API_URL}/user/bookings`, {
           headers: { Authorization: `Bearer ${token}` },
         })
       ]);

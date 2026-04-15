@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 
-const API = "http://localhost:3000/api/v1";
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1";
 
 export default function AdminUsersPage() {
   const { token, user: currentUser } = useAuth();

@@ -4,6 +4,7 @@ import React, { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useBooking } from "@/app/context/BookingContext";
 import { useAuth } from "@/app/context/AuthContext";
+import { API_URL } from "@/app/config";
 
 interface EnquiryPartItem {
   partId: string;
@@ -88,7 +89,7 @@ export default function SparePartsEnquiryForm({
     setIsSubmitting(true);
 
     try {
-      const res = await fetch("http://localhost:3000/api/v1/part-orders", {
+      const res = await fetch(`${API_URL}/part-orders`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

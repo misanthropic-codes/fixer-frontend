@@ -28,7 +28,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const API_URL = "http://localhost:3000/api/v1/auth";
+  const API_URL = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1"}/auth`;
 
   useEffect(() => {
     const savedToken = Cookies.get("fixxer_token");

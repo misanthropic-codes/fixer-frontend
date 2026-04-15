@@ -8,7 +8,7 @@ import ServicesClient from "./ServicesClient";
 export default async function ServicesPage() {
   let services = [];
   try {
-    const res = await fetch("http://localhost:3000/api/v1/services", {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1"}/services`, {
       cache: "no-store",
     });
     if (res.ok) {

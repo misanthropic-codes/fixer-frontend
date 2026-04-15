@@ -20,19 +20,9 @@ export default function AdminLoginPage() {
 
     try {
       await login(phone, password);
-      // After login, check role from /me
-      const token = document.cookie.match(/fixxer_token=([^;]+)/)?.[1];
-      if (token) {
-        const res = await fetch("http://localhost:3000/api/v1/auth/me", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const user = await res.json();
-        if (user.role !== "ADMIN") {
-          setError("Access denied. Admin credentials required.");
-          setLoading(false);
-          return;
-        }
-      }
+      // login() already fetches user data and sets it in context.
+      // We need to wait briefly for state to propagate, then check role.
+      // The layout's useEffect will handle redirecting non-admins.
       router.push("/admin");
     } catch (err: any) {
       setError(err.message || "Invalid credentials");

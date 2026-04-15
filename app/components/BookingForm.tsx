@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { API_URL } from "@/app/config";
 
 interface BookingFormProps {
   initialServiceSlug?: string;
@@ -33,7 +34,7 @@ export default function BookingForm({ initialServiceSlug, onSuccess, className =
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/v1/services");
+        const res = await fetch(`${API_URL}/services`);
         if (res.ok) {
           const data = await res.json();
           setServices(data);
@@ -79,7 +80,7 @@ export default function BookingForm({ initialServiceSlug, onSuccess, className =
     setIsSubmitting(true);
     
     try {
-      const res = await fetch("http://localhost:3000/api/v1/bookings", {
+      const res = await fetch(`${API_URL}/bookings`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -5,7 +5,7 @@ import { useAuth } from "@/app/context/AuthContext";
 import { openJobSheet } from "@/app/admin/utils/jobsheet";
 
 const STATUSES = ["ALL", "PENDING", "CONFIRMED", "ASSIGNED", "IN_PROGRESS", "COMPLETED", "RESCHEDULED", "CANCELLED"];
-const API = "http://localhost:3000/api/v1";
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1";
 
 export default function AdminBookingsPage() {
   const { token } = useAuth();
@@ -76,7 +76,19 @@ export default function AdminBookingsPage() {
   };
 
   const exportCsv = () => {
-    window.open(`${API}/admin/bookings/export?token=${token}`, "_blank");
+    if (!token) return;
+    fetch(`${API}/admin/bookings/export`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => r.blob())
+      .then((blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "bookings-export.csv";
+        a.click();
+        URL.revokeObjectURL(url);
+      });
   };
 
   return (

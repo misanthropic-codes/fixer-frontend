@@ -12,7 +12,7 @@ export default async function ServiceDetail({ params }: { params: Promise<{ slug
   
   let service = null;
   try {
-    const res = await fetch(`http://localhost:3000/api/v1/services/${slug}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1"}/services/${slug}`, {
       cache: "no-store",
     });
     if (res.ok) {
