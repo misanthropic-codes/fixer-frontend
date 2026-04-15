@@ -263,6 +263,21 @@ export default function BookingDetailPage() {
             <p style={{ fontSize: 13, color: "var(--admin-text-dim)", marginTop: 4 }}>
               Created on {new Date(booking.createdAt).toLocaleString()}
             </p>
+            {booking.parentId && (
+              <p style={{ fontSize: 13, marginTop: 4 }}>
+                <span className="material-symbols-outlined" style={{ fontSize: 14, verticalAlign: 'middle', marginRight: 4 }}>link</span>
+                Original Service: <a href={`/admin/bookings/${booking.parentId}`} style={{ color: 'var(--admin-primary)', fontWeight: 600 }}>#{booking.parentId.slice(-6).toUpperCase()}</a>
+              </p>
+            )}
+            {booking.claimBookingIds && booking.claimBookingIds.length > 0 && (
+              <div style={{ fontSize: 13, marginTop: 4, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <span className="material-symbols-outlined" style={{ fontSize: 14, verticalAlign: 'middle' }}>history</span>
+                <span>Warranty Claims:</span>
+                {booking.claimBookingIds.map((cid: any) => (
+                  <a key={cid} href={`/admin/bookings/${cid}`} style={{ color: 'var(--admin-primary)', fontWeight: 600 }}>#{cid.slice(-6).toUpperCase()}</a>
+                ))}
+              </div>
+            )}
           </div>
         </div>
         <div style={{ display: "flex", gap: 12 }}>
