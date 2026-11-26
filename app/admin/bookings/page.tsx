@@ -13,6 +13,8 @@ import {
   resolveBookingTechnicianId,
 } from "@/app/lib/admin-manage-visits";
 import ManageVisitsModal from "./ManageVisitsModal";
+import StaffSlotModal from "@/app/admin/components/StaffSlotModal";
+import { formatIstRange, isFixxerStaff } from "@/app/lib/admin-schedule";
 
 const API =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1";
@@ -48,6 +50,7 @@ export default function AdminBookingsPage() {
 
   const [bookings, setBookings] = useState<any[]>([]);
   const [technicians, setTechnicians] = useState<any[]>([]);
+  const [slotModal, setSlotModal] = useState<{ booking: any; technicianId: string } | null>(null);
 
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -901,12 +904,20 @@ export default function AdminBookingsPage() {
                         booking.technicianId ||
                         ""
                       }
-                      onChange={(event) =>
+                      onChange={(event) => {
+                        const picked = technicians.find(
+                          (t) => t._id === event.target.value,
+                        );
+                        // Fixxer staff are scheduled into a time slot first.
+                        if (isFixxerStaff(picked)) {
+                          setSlotModal({ booking, technicianId: picked._id });
+                          return;
+                        }
                         handleAssignTechnician(
                           booking._id,
                           event.target.value
-                        )
-                      }
+                        );
+                      }}
                       disabled={
                         updatingId === booking._id ||
                         isAssignBlockedStatus(booking.status)
@@ -925,9 +936,15 @@ export default function AdminBookingsPage() {
                             value={technician._id}
                           >
                             {technician.name}
+                            {isFixxerStaff(technician) ? " · Fixxer" : ""}
                           </option>
                         ))}
                     </select>
+                    {booking.scheduledStart && booking.scheduledEnd && (
+                      <div style={{ fontSize: 10, color: "var(--admin-text-dim)", marginTop: 3 }}>
+                        {formatIstRange(booking.scheduledStart, booking.scheduledEnd)}
+                      </div>
+                    )}
                   </td>
 
                   {/* Status */}
@@ -1525,6 +1542,20 @@ export default function AdminBookingsPage() {
           onClose={() => setVisitModal(null)}
           onAssigned={() => {
             void fetchBookings();
+          }}
+        />
+      )}
+      {slotModal && (
+        <StaffSlotModal
+          token={token}
+          booking={slotModal.booking}
+          technicians={technicians}
+          mode="assign"
+          initialTechnicianId={slotModal.technicianId}
+          onClose={() => setSlotModal(null)}
+          onDone={() => {
+            setSlotModal(null);
+            fetchBookings();
           }}
         />
       )}

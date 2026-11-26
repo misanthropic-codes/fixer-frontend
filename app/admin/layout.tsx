@@ -31,6 +31,7 @@ const NAV_SECTIONS: NavSection[] = [
     title: "Fixxer Service",
     items: [
       { href: "/admin/bookings", icon: "calendar_month", label: "Bookings" },
+      { href: "/admin/schedule", icon: "view_timeline", label: "Schedule" },
       { href: "/admin/offers", icon: "local_offer", label: "Offers" },
       {
         href: "/admin/appliance-mappings",

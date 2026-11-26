@@ -28,7 +28,7 @@ export default function TechniciansPage() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [filter, setFilter] = useState<FilterTab>("all");
-  const [formData, setFormData] = useState({ name: "", phone: "", email: "", skills: "" });
+  const [formData, setFormData] = useState({ name: "", phone: "", email: "", skills: "", employmentType: "FIXXER_STAFF" });
 
   useEffect(() => {
     if (token) fetchTechnicians();
@@ -139,7 +139,14 @@ export default function TechniciansPage() {
             ) : (
               filtered.map((t) => (
                 <tr key={t._id}>
-                  <td style={{ fontWeight: 600 }}>{t.name}</td>
+                  <td style={{ fontWeight: 600 }}>
+                    {t.name}
+                    <div>
+                      <span className={`admin-badge admin-badge-${t.employmentType === "FIXXER_STAFF" ? "admin" : "ghost"}`} style={{ zoom: 0.75 }}>
+                        {t.employmentType === "FIXXER_STAFF" ? "FIXXER STAFF" : "PARTNER"}
+                      </span>
+                    </div>
+                  </td>
                   <td>{t.phone}</td>
                   <td>
                     <span className={`admin-badge ${verificationBadgeClass(t.verificationStatus)}`}>
@@ -199,6 +206,17 @@ export default function TechniciansPage() {
                 <div>
                   <label className="admin-label">Skills (comma separated)</label>
                   <input value={formData.skills} onChange={e => setFormData({...formData, skills: e.target.value})} className="admin-input" placeholder="Washing Machine, AC" />
+                </div>
+                <div>
+                  <label className="admin-label">Employment type</label>
+                  <select
+                    className="admin-input admin-select"
+                    value={formData.employmentType}
+                    onChange={e => setFormData({ ...formData, employmentType: e.target.value })}
+                  >
+                    <option value="FIXXER_STAFF">Fixxer staff (admin schedules their jobs)</option>
+                    <option value="PARTNER">Partner (picks jobs in the app)</option>
+                  </select>
                 </div>
               </div>
               <div className="admin-modal-footer">

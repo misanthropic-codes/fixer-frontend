@@ -6,6 +6,8 @@ import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext";
 import ManageVisitsModal from "../ManageVisitsModal";
 import AddPartModal from "../AddPartModal";
+import StaffSlotModal from "@/app/admin/components/StaffSlotModal";
+import { formatIstRange, isFixxerStaff } from "@/app/lib/admin-schedule";
 import { openJobSheet, openRetailInvoice } from "@/app/admin/utils/jobsheet";
 import { buildJobSheetDefaults, partsFromVisits } from "@/app/lib/job-sheet-defaults";
 import {
@@ -30,6 +32,7 @@ export default function BookingDetailPage() {
   const [updating, setUpdating] = useState(false);
   const [fixxerCode, setFixxerCode] = useState("");
   const [assignError, setAssignError] = useState("");
+  const [slotModal, setSlotModal] = useState<{ mode: "assign" | "reschedule"; technicianId?: string } | null>(null);
   
   const [visitModalVisible, setVisitModalVisible] = useState(false);
   const [addPartModalVisible, setAddPartModalVisible] = useState(false);
@@ -352,6 +355,13 @@ export default function BookingDetailPage() {
       );
       return;
     }
+    if (
+      ["PENDING", "CONFIRMED"].includes(newStatus) &&
+      hasTechnician &&
+      !confirm(`Moving this job to ${newStatus} removes the assigned technician. Continue?`)
+    ) {
+      return;
+    }
     if (newStatus === "COMPLETED" && !/^\d{6}$/.test(fixxerCode.replace(/\D/g, ""))) {
       alert("Enter the customer's 6-digit FIXXER CODE before closing the job.");
       return;
@@ -373,6 +383,7 @@ export default function BookingDetailPage() {
         return;
       }
       fetchBookingInfo();
+      fetchTechnicians();
     } catch (err) {
       console.error(err);
     } finally {
@@ -380,9 +391,41 @@ export default function BookingDetailPage() {
     }
   };
 
+  const handleUnassignTechnician = async () => {
+    if (!confirm("Remove the technician from this job? They will be free for other work.")) return;
+    setUpdating(true);
+    setAssignError("");
+    try {
+      const res = await fetch(`${API}/admin/bookings/${id}/unassign`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setAssignError(
+          (typeof data?.message === "string" && data.message) || "Could not unassign technician.",
+        );
+        return;
+      }
+      await fetchBookingInfo({ silent: true });
+      fetchTechnicians();
+    } catch (err) {
+      console.error(err);
+      setAssignError(err instanceof Error ? err.message : "Could not unassign technician.");
+    } finally {
+      setUpdating(false);
+    }
+  };
+
   const handleAssignTechnician = async (technicianId: string) => {
     if (!technicianId) {
-      setAssignError("Select a technician to assign. Clearing assignment is not available from this control.");
+      await handleUnassignTechnician();
+      return;
+    }
+    // Fixxer staff are scheduled into a time slot first.
+    if (isFixxerStaff(technicians.find((t) => t._id === technicianId))) {
+      setAssignError("");
+      setSlotModal({ mode: "assign", technicianId });
       return;
     }
     setUpdating(true);
@@ -403,6 +446,7 @@ export default function BookingDetailPage() {
         return;
       }
       await fetchBookingInfo({ silent: true });
+      fetchTechnicians();
     } catch (err) {
       console.error(err);
       setAssignError(err instanceof Error ? err.message : "Could not assign technician.");
@@ -1455,9 +1499,52 @@ export default function BookingDetailPage() {
                   technicians,
                   resolveBookingTechnicianId(booking.technicianId),
                 ).map(t => (
-                  <option key={t._id} value={t._id}>{t.name}</option>
+                  <option key={t._id} value={t._id}>
+                    {t.name}{isFixxerStaff(t) ? " · Fixxer" : ""}
+                  </option>
                 ))}
               </select>
+              {!booking.scheduledStart &&
+                isFixxerStaff(booking.technicianId) &&
+                ["ASSIGNED", "EN_ROUTE", "IN_PROGRESS"].includes(booking.status) && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8, fontSize: 13 }}>
+                    <span className="admin-badge admin-badge-warning">No time set</span>
+                    <button
+                      type="button"
+                      className="admin-btn admin-btn-secondary admin-btn-sm"
+                      disabled={updating}
+                      onClick={() => setSlotModal({ mode: "reschedule" })}
+                    >
+                      Set time
+                    </button>
+                  </div>
+                )}
+              {booking.scheduledStart && booking.scheduledEnd && (
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8, fontSize: 13 }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 16 }}>schedule</span>
+                  <span>
+                    {new Date(booking.scheduledStart).toLocaleDateString("en-IN", {
+                      timeZone: "Asia/Kolkata",
+                      weekday: "short",
+                      day: "numeric",
+                      month: "short",
+                    })}
+                    {" · "}
+                    {formatIstRange(booking.scheduledStart, booking.scheduledEnd)}
+                  </span>
+                  {["ASSIGNED", "EN_ROUTE", "IN_PROGRESS"].includes(booking.status) &&
+                    isFixxerStaff(booking.technicianId) && (
+                      <button
+                        type="button"
+                        className="admin-btn admin-btn-ghost admin-btn-sm"
+                        disabled={updating}
+                        onClick={() => setSlotModal({ mode: "reschedule" })}
+                      >
+                        {booking.status === "ASSIGNED" ? "Change time" : "Extend"}
+                      </button>
+                    )}
+                </div>
+              )}
               {assignError && (
                 <p
                   role="alert"
@@ -1744,6 +1831,21 @@ export default function BookingDetailPage() {
           originalParts={booking.originalParts || []}
           onAdded={() => fetchBookingInfo()}
           onClose={() => setAddPartModalVisible(false)}
+        />
+      )}
+      {slotModal && (
+        <StaffSlotModal
+          token={token}
+          booking={booking}
+          technicians={technicians}
+          mode={slotModal.mode}
+          initialTechnicianId={slotModal.technicianId}
+          onClose={() => setSlotModal(null)}
+          onDone={() => {
+            setSlotModal(null);
+            void fetchBookingInfo({ silent: true });
+            fetchTechnicians();
+          }}
         />
       )}
     </div>

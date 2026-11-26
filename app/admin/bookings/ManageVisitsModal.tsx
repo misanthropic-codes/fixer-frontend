@@ -6,10 +6,19 @@ import {
   needsAssignBeforeVisit,
   resolveVisitTechnicianId,
 } from "@/app/lib/admin-manage-visits";
+import StaffSlotModal from "@/app/admin/components/StaffSlotModal";
+import { isFixxerStaff } from "@/app/lib/admin-schedule";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1";
 
-type TechOption = { _id: string; name?: string; isActive?: boolean; idVerified?: boolean };
+type TechOption = {
+  _id: string;
+  name?: string;
+  isActive?: boolean;
+  idVerified?: boolean;
+  employmentType?: string | null;
+  availabilityStatus?: string | null;
+};
 
 export default function ManageVisitsModal({
   bookingId,
@@ -29,6 +38,9 @@ export default function ManageVisitsModal({
   const [visits, setVisits] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [pickedTechId, setPickedTechId] = useState("");
+  // Fixxer staff are assigned through a time slot first; remember who got assigned here.
+  const [assignedTechId, setAssignedTechId] = useState("");
+  const [slotForTechId, setSlotForTechId] = useState("");
   const [availableTechs, setAvailableTechs] = useState<TechOption[]>(technicians);
 
   // New Visit State
@@ -42,7 +54,8 @@ export default function ManageVisitsModal({
   });
 
   const assignableTechs = filterAssignableTechnicians(availableTechs);
-  const effectiveTechId = resolveVisitTechnicianId(technicianId, pickedTechId);
+  const bookingTechId = technicianId || assignedTechId;
+  const effectiveTechId = resolveVisitTechnicianId(bookingTechId, pickedTechId);
 
   useEffect(() => {
     fetchVisits();
@@ -88,7 +101,7 @@ export default function ManageVisitsModal({
     }
     try {
       // Assign booking when opening visits on an unassigned job.
-      if (needsAssignBeforeVisit(technicianId)) {
+      if (needsAssignBeforeVisit(bookingTechId)) {
         const assignRes = await fetch(`${API}/admin/bookings/${bookingId}/assign`, {
           method: "PUT",
           headers: {
@@ -145,6 +158,7 @@ export default function ManageVisitsModal({
   };
 
   return (
+    <>
     <div className="admin-modal-overlay" onClick={onClose}>
       <div className="admin-modal" style={{ width: 600, maxWidth: '90vw' }} onClick={e => e.stopPropagation()}>
         <div className="admin-modal-header">
@@ -194,14 +208,21 @@ export default function ManageVisitsModal({
                 <form onSubmit={handleCreateVisit} style={{ border: '2px dashed var(--admin-border)', padding: 16, borderRadius: 12 }}>
                   <h3 style={{ fontSize: 14, marginBottom: 16 }}>Schedule Visit #{newVisit.visitOrder}</h3>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
-                    {!technicianId && (
+                    {!bookingTechId && (
                       <div style={{ gridColumn: '1 / -1' }}>
                         <label className="admin-label">Available technicians</label>
                         <select
                           required
                           className="admin-input admin-select"
                           value={pickedTechId}
-                          onChange={(e) => setPickedTechId(e.target.value)}
+                          onChange={(e) => {
+                            const picked = availableTechs.find((t) => t._id === e.target.value);
+                            if (isFixxerStaff(picked)) {
+                              setSlotForTechId(e.target.value);
+                              return;
+                            }
+                            setPickedTechId(e.target.value);
+                          }}
                         >
                           <option value="">
                             {assignableTechs.length
@@ -211,6 +232,7 @@ export default function ManageVisitsModal({
                           {assignableTechs.map((t) => (
                             <option key={t._id} value={t._id}>
                               {t.name || t._id}
+                              {isFixxerStaff(t) ? " · Fixxer (pick a time)" : ""}
                             </option>
                           ))}
                         </select>
@@ -244,5 +266,23 @@ export default function ManageVisitsModal({
         </div>
       </div>
     </div>
+    {slotForTechId && (
+      <StaffSlotModal
+        token={token}
+        booking={{ _id: bookingId }}
+        technicians={availableTechs.map((t) => ({ ...t, name: t.name || t._id }))}
+        mode="assign"
+        initialTechnicianId={slotForTechId}
+        onClose={() => setSlotForTechId("")}
+        onDone={() => {
+          // Booking is now assigned with a slot; the visit form continues for this technician.
+          setAssignedTechId(slotForTechId);
+          setPickedTechId(slotForTechId);
+          setSlotForTechId("");
+          onAssigned?.();
+        }}
+      />
+    )}
+    </>
   );
 }

@@ -81,7 +81,7 @@ export default function TechnicianDetailPage() {
       await fetchAll();
     } catch (err) {
       console.error(err);
-      alert("Action failed. Please try again.");
+      alert(err instanceof Error && err.message ? err.message : "Action failed. Please try again.");
     } finally {
       setActionLoading(null);
     }
@@ -120,13 +120,57 @@ export default function TechnicianDetailPage() {
       if (!res.ok) throw new Error("Request failed");
     });
 
+  const setEmploymentType = (employmentType: string) =>
+    runAction("employment", async () => {
+      const res = await fetch(`${API}/admin/technicians/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ employmentType }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(
+          (typeof data?.message === "string" && data.message) || "Could not change employment type.",
+        );
+      }
+    });
+
+  // Admin sets on/off duty (no technician app in production). ON_JOB is set by live jobs.
+  const setOffDuty = (offDuty: boolean) => {
+    if (
+      offDuty &&
+      !confirm(
+        "Mark off duty? Their already scheduled jobs stay on the schedule — reassign or move them. New assignments will warn that they are off duty.",
+      )
+    ) {
+      return;
+    }
+    return runAction("duty", async () => {
+      const res = await fetch(`${API}/admin/technicians/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ availabilityStatus: offDuty ? "UNAVAILABLE" : "AVAILABLE" }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error((typeof data?.message === "string" && data.message) || "Could not change duty status.");
+      }
+    });
+  };
+
   const toggleActive = (activate: boolean) =>
     runAction(activate ? "activate" : "deactivate", async () => {
       const res = await fetch(`${API}/admin/technicians/${id}/${activate ? "activate" : "deactivate"}`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error("Toggle failed");
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(
+          (typeof data?.message === "string" && data.message) ||
+            (activate ? "Could not activate technician." : "Could not deactivate technician."),
+        );
+      }
     });
 
   if (loading) return <div style={{ padding: 40 }}>Loading technician profile...</div>;
@@ -157,7 +201,35 @@ export default function TechnicianDetailPage() {
             Joined {new Date(technician.createdAt).toLocaleDateString()}
           </p>
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <select
+            className="admin-input admin-select"
+            style={{ height: 32, fontSize: 12, width: 170 }}
+            aria-label="Employment type"
+            value={technician.employmentType === "FIXXER_STAFF" ? "FIXXER_STAFF" : "PARTNER"}
+            disabled={!!actionLoading}
+            onChange={(e) => setEmploymentType(e.target.value)}
+          >
+            <option value="FIXXER_STAFF">Fixxer staff</option>
+            <option value="PARTNER">Partner</option>
+          </select>
+          {technician.availabilityStatus === "UNAVAILABLE" ? (
+            <button
+              className="admin-btn admin-btn-secondary admin-btn-sm"
+              disabled={!!actionLoading}
+              onClick={() => setOffDuty(false)}
+            >
+              Back on duty
+            </button>
+          ) : (
+            <button
+              className="admin-btn admin-btn-secondary admin-btn-sm"
+              disabled={!!actionLoading}
+              onClick={() => setOffDuty(true)}
+            >
+              Mark off duty
+            </button>
+          )}
           {technician.isActive ? (
             <button
               className="admin-btn admin-btn-secondary admin-btn-sm"

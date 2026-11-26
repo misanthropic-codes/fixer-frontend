@@ -43,8 +43,12 @@ export function buildVisitModalState(booking: {
 export function isAvailableForAssignment(tech: {
   isActive?: boolean;
   availabilityStatus?: string | null;
+  employmentType?: string | null;
 }): boolean {
-  return tech.isActive !== false && tech.availabilityStatus === "AVAILABLE";
+  if (tech.isActive === false) return false;
+  // Fixxer staff are scheduled into slots: on a job now doesn't hide them; off duty does.
+  if (tech.employmentType === "FIXXER_STAFF") return tech.availabilityStatus !== "UNAVAILABLE";
+  return tech.availabilityStatus === "AVAILABLE";
 }
 
 export function filterAssignableTechnicians<
@@ -52,6 +56,7 @@ export function filterAssignableTechnicians<
     _id: string;
     isActive?: boolean;
     availabilityStatus?: string | null;
+    employmentType?: string | null;
   },
 >(technicians: T[], currentTechnicianId?: string | null): T[] {
   const current = currentTechnicianId ? String(currentTechnicianId) : "";
